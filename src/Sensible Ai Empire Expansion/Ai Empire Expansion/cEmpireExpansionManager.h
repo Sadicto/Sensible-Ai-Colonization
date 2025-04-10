@@ -1,0 +1,257 @@
+#pragma once
+
+#include <Spore\BasicIncludes.h>
+#include <Spore/Simulator/Serialization.h>
+
+#define cEmpireExpansionManagerPtr intrusive_ptr<cEmpireExpansionManager>
+
+///
+/// In your dllmain Initialize method, add the system like this:
+/// ModAPI::AddSimulatorStrategy(new cEmpireExpansionManager(), cEmpireExpansionManager::NOUN_ID);
+///
+using namespace Simulator;
+
+class cEmpireExpansionManager
+	: public Simulator::cStrategy
+{
+public:
+	static const uint32_t TYPE = id("AiEmpireExpansion::cEmpireExpansionManager");
+	static const uint32_t NOUN_ID = TYPE;
+
+	int AddRef() override;
+
+	int Release() override;
+
+	void Initialize() override;
+
+	void Dispose() override;
+
+	const char* GetName() const override;
+
+	bool Write(Simulator::ISerializerStream* stream) override;
+
+	bool Read(Simulator::ISerializerStream* stream) override;
+
+	bool WriteToXML(XmlSerializer* xml) override;
+
+	void Update(int deltaTime, int deltaGameTime) override;
+	// Inherited via cStrategy
+	
+	void OnModeEntered(uint32_t previousModeID, uint32_t newModeID) override;
+
+	static Simulator::Attribute ATTRIBUTES[];
+	//
+	// You can add more methods here
+	//
+
+	static cEmpireExpansionManagerPtr Get();
+
+
+	// All methods have only been tested in space stage.
+	// Some methods that change stars or planets may not work correctly 
+	// if the player is on the planet or the star being changed.
+
+	/**
+	* @brief Gets the current star system the player is in.
+	* Preconditions: none.
+	* @return Pointer to the current star system (cStarRecord*).
+	*/
+	cStarRecord* GetCurrentStar();
+
+	/**
+	 * @brief Retrieves the empire that owns the current system.
+	 * Preconditions: system has an owner.
+	 * @return Pointer to the owning empire (cEmpire*).
+	 */
+	cEmpire* GetOwnerOfCurrentSystem();
+
+	/**
+	 * @brief Determines if a given planet is colonizable, meaning it is a terrestrial planet,
+	 * is not destroyed, and is not an adventure. (TODO check for 201 ruins planet)
+	 * Preconditions: none.
+	 * @param planet Pointer to the planet (cPlanetRecord*) to check for colonization.
+	 * @return true if the planet is colonizable, false otherwise.
+	 */
+	bool ColonizablePlanet(cPlanetRecord* planet);
+
+	/**
+	 * @brief Calculates the colonization score of a planet,
+	 * with higher scores for larger terrascores,
+	 * expensive spice, and T0 with green orbits,
+	 * and lower scores for moons.
+	 * Preconditions: none.
+	 * @param planet Pointer to the planet (cPlanetRecord*) to evaluate.
+	 * @return Integer score representing the colonization potential of the planet.
+	 */
+	int PlanetColonizationScore(cPlanetRecord* planet);
+
+	/**
+	* @brief Determines if a given star system is colonizable, meaning it is a star,
+	* has no owning empire (tribes and civilizations do not count), has no monolith 
+	* is not sol, contains at least one colonizable planet and 
+	* is at most activeRadius parsecs from the player
+	* Preconditions: none.
+	* @param star Pointer to the star system (cStarRecord*) to check for colonization.
+	* @return true if the star is colonizable, false otherwise.
+	*/
+	bool ColonizableStar(cStarRecord* star);
+
+	/**
+	 * @brief Finds the planet with the highest colonization score in a star.
+	 * Preconditions: At least one planet in the star, ColonizablePlanet(planet).
+	 * @param star Pointer to the star system (cStarRecord*) to evaluate.
+	 * @return Pointer to the best colonizable planet (cPlanetRecordPtr).
+	 */
+	cPlanetRecordPtr BestColonizablePlanet(cStarRecord* star);
+
+	/**
+	 * @brief Calculates the colonization score of a star system
+	 * using its highest planet score, reducing it if the star
+	 * has tribes and further if it has a civilization.
+	 * Preconditions: At least one planet in the star, ColonizablePlanet(planet).
+	 * @param star Pointer to the star system (cStarRecord*) to evaluate.
+	 * @return Float score representing the colonization potential of the star.
+	 */
+	float StarColonizationScore(cStarRecord* star);
+
+	/**
+	 * @brief Deletes a tribal species from a star system.
+	 * Preconditions: none.
+	 * @param star Pointer to the star system (cStarRecord*) containing the tribal civilization.
+	 */
+	void DeleteTribeFromStar(cStarRecord* star);
+
+	/**
+	 * @brief Deletes a civilization from a star system.
+	 * Preconditions: none.
+	 * @param star Pointer to the star system (cStarRecord*) containing the civilization.
+	 */
+	void DeleteCivFromStar(cStarRecord* star);
+
+	/**
+	* @brief Returns the orbit's type of a planet (hot, cold or normal).
+	* Preconditions: none.
+	* @param planet Pointer to the planet.
+	*/
+	SolarSystemOrbitTemperature GetPlanetOrbitTemperature(cPlanetRecord* planet);
+
+	//
+	/*
+	*  @brief Assign spices to all planets in the stars and generates terrain for all the T0 planets.
+	* Preconditions: none.
+	* @param star The star system in which the planets will be generated
+	*/
+	void GeneratePlanets(cStarRecord* star);
+
+	/**
+	 * @brief Colonizes a star system with the given empire.
+	 * Preconditions: ColonizableStar(star) and no tribes or civilizations present.
+	 * @param empire Pointer to the empire (cEmpire*) performing the colonization.
+	 * @param star Pointer to the star system (cStarRecord*) being colonized.
+	 */
+	void ColonizeStarSystem(cEmpire* empire, cStarRecord* star);
+
+	/**
+	 * @brief Retrieves all empires within a given radius of coordinates,
+	 * except for the Grox and the player empire.
+	 * Preconditions: none.
+	 * @param coords Vector3 representing the center coordinates.
+	 * @param radius Float representing the search radius in parsecs.
+	 * @param empires Vector to store the list of empires (eastl::vector<cEmpirePtr>&)
+	 * found within the radius.
+	 */
+	void GetEmpiresInRadius(const Vector3& coords, float radius, eastl::vector<cEmpirePtr>& empires);
+
+
+	/**
+	 * @brief Retrieves all unclaimed stars (by an empire) within a given radius of coordinates.
+	 * Preconditions: none.
+	 * @param coords Vector3 representing the center coordinates.
+	 * @param radius Float representing the search radius in parsecs.
+	 * @param stars Vector to store the list of unclaimed stars (eastl::vector<cStarRecordPtr>&) found within the radius.
+	 */
+	void GetUnclaimedStarsInRadius(const Vector3& coords, float radius, eastl::vector<cStarRecordPtr>& stars);
+
+	/**
+	 * @brief Calculates the distance between two star systems.
+	 * Preconditions: none.
+	 * @param star1 Pointer to the first star system (cStarRecord*).
+	 * @param star2 Pointer to the second star system (cStarRecord*).
+	 * @return Float representing the distance between the two stars in parsecs.
+	 */
+	float GetDistanceBetweenStars(cStarRecord* star1, cStarRecord* star2);
+
+	/**
+	* @brief Expands the empire to a new star system,
+	* prioritizing those closer to the homeworld, other colonies,
+	* and a higher StarColonizationScore(Star).
+	* The empire may not expand if there are no nearby colonizable stars.
+	* Will never colonize GetCurrentStar().
+	* Preconditions: none.
+	* @param empire Pointer to the empire (cEmpire*) expanding.
+	*/
+	void ExpandEmpire(cEmpire* empire);
+
+	/**
+	 * @brief Calculates the probability of an empire expanding to new systems
+	 * based on its current number of stars. The process is explained in the definition.
+	 * Preconditions: none.
+	 * @param empire Pointer to the empire (cEmpire*) being evaluated.
+	 * @return Float between 0 and 1 representing the probability of expansion.
+	 */
+	float EmpireExpansionProbability(cEmpire* empire);
+
+	/**
+	 * @brief Executes one cycle of the manager, expanding nearby empires
+	 * according to EmpireExpansionProbability(empire).
+	 * Preconditions: none.
+	 */
+	void EmpiresExpansionCycle();
+	
+
+private:
+
+	
+	static cEmpireExpansionManagerPtr instance;
+
+	static const float eMeanOneSystem;
+	static const float eMaxMean;
+	static const float eCyclesToApexColonies;
+
+	static const float mMeanOneSystem;
+	static const float mMaxMean;
+	static const float mCyclesToApexColonies;
+
+	static const float hMeanOneSystem;
+	static const float hMaxMean;
+	static const float hCyclesToApexColonies;
+
+	// Radius (in parsecs) in which empires colonize systems
+	static const float activeRadius;
+
+	// Miliseconds of gameTime between expansion cycles
+	static const int cycleInterval;
+
+	// Number of systems that maximize the probability of expansion in a cycle.
+	static const float apexCantSystems;
+
+	// Represents the average cycles necessary for an empire to colonize its first system.
+	float meanOneSystem;
+
+	// The maximum average cycles necessary to colonize the next system, regardless of the number of colonies.
+	float maxMean;
+
+	// Average cycles necessary for an empire to reach apexCantSystems colonies.
+	float cyclesToApexColonies;
+
+	ResourceKey redSpice;
+	ResourceKey yellowSpice;
+	ResourceKey blueSpice;
+	ResourceKey greenSpice;
+	ResourceKey pinkSpice;
+	ResourceKey purpleSpice;
+
+	ResourceKey adventureIconKey;
+
+	int elapsedTime;
+};
