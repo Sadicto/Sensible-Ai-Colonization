@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<mod description="" displayName="Sensible Ai Empire Expansion" dllsBuild="$SPOREMOD_DLLS_BUILD" hasCustomInstaller="false" installerSystemVersion="1.0.1.2" isExperimental="$SPOREMOD_EXPERIMENTAL" unique="SensibleAiEmpireExpansion">
+<mod description="" displayName="Sensible Ai Empire Expansion" dllsBuild="$SPOREMOD_DLLS_BUILD" githubUrl="https://github.com/Sadicto/Sensible-Ai-Empire-Expansion" hasCustomInstaller="false" installerSystemVersion="1.0.1.2" isExperimental="$SPOREMOD_EXPERIMENTAL" unique="SensibleAiEmpireExpansion" websiteUrl="https://github.com/Sadicto/Sensible-Ai-Empire-Expansion">
   <prerequisite game="GalacticAdventures">Sensible_Ai_Empire_Expansion.package</prerequisite>
 </mod>
