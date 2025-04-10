@@ -17,7 +17,7 @@ const float cEmpireExpansionManager::hCyclesToApexColonies = 80.0f;
 
 const float cEmpireExpansionManager::activeRadius = 30;
 
-const int cEmpireExpansionManager::cycleInterval = 30000; 
+const int cEmpireExpansionManager::cycleInterval = 1000//30000; 
 
 const float cEmpireExpansionManager::apexCantSystems = 13.0f;
 
