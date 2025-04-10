@@ -5,10 +5,6 @@
 
 #define cEmpireExpansionManagerPtr intrusive_ptr<cEmpireExpansionManager>
 
-///
-/// In your dllmain Initialize method, add the system like this:
-/// ModAPI::AddSimulatorStrategy(new cEmpireExpansionManager(), cEmpireExpansionManager::NOUN_ID);
-///
 using namespace Simulator;
 
 class cEmpireExpansionManager
@@ -32,7 +28,7 @@ public:
 
 	bool Read(Simulator::ISerializerStream* stream) override;
 
-	bool WriteToXML(XmlSerializer* xml) override;
+	bool WriteToXML(Simulator::XmlSerializer* xml) override;
 
 	void Update(int deltaTime, int deltaGameTime) override;
 	// Inherited via cStrategy
@@ -96,6 +92,14 @@ public:
 	*/
 	bool ColonizableStar(cStarRecord* star);
 
+
+	/**
+	 * Determines whether the given empire can colonize the specified star system.
+	 * A star is colonizable if ColonizableStar(star) returns true.
+	 * If the system contains civilizations or tribes, the empire must have a high enough level.
+	 */
+	bool EmpireCanColonizeStar(cEmpire* empire, cStarRecord* star);
+
 	/**
 	 * @brief Finds the planet with the highest colonization score in a star.
 	 * Preconditions: At least one planet in the star, ColonizablePlanet(planet).
@@ -137,7 +141,7 @@ public:
 
 	//
 	/*
-	*  @brief Assign spices to all planets in the stars and generates terrain for all the T0 planets.
+	*  @brief Assign spices to all planets in the stars and generates its orbits.
 	* Preconditions: none.
 	* @param star The star system in which the planets will be generated
 	*/
@@ -214,26 +218,14 @@ private:
 	
 	static cEmpireExpansionManagerPtr instance;
 
-	static const float eMeanOneSystem;
-	static const float eMaxMean;
-	static const float eCyclesToApexColonies;
-
-	static const float mMeanOneSystem;
-	static const float mMaxMean;
-	static const float mCyclesToApexColonies;
-
-	static const float hMeanOneSystem;
-	static const float hMaxMean;
-	static const float hCyclesToApexColonies;
-
 	// Radius (in parsecs) in which empires colonize systems
-	static const float activeRadius;
+	float activeRadius;
 
 	// Miliseconds of gameTime between expansion cycles
-	static const int cycleInterval;
+	int cycleInterval;
 
 	// Number of systems that maximize the probability of expansion in a cycle.
-	static const float apexCantSystems;
+	float apexCantSystems;
 
 	// Represents the average cycles necessary for an empire to colonize its first system.
 	float meanOneSystem;
@@ -243,6 +235,15 @@ private:
 
 	// Average cycles necessary for an empire to reach apexCantSystems colonies.
 	float cyclesToApexColonies;
+
+	// Colonization range per empire level, in parsecs.
+	eastl::vector<float> colonizationRange;
+
+	// Minimun level for an empire to be able to colonize a star with a tribe.
+	int levelToColonizeTribe;
+
+	// Minimun level for an empire to be able to colonize a star with a civ.
+	int levelToColonizeCiv;
 
 	ResourceKey redSpice;
 	ResourceKey yellowSpice;
