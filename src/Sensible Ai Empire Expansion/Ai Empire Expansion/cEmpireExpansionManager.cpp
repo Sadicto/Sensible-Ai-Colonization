@@ -200,6 +200,7 @@ bool cEmpireExpansionManager::ColonizableStar(cStarRecord* star) {
 		type != StarType::ProtoPlanetary &&
 		star->GetTechLevel() != TechLevel::Empire &&
 		(star->mFlags & (1 << 3)) == 0 && //no monolith
+		(star->mFlags & (1 << 1)) == 0 && //no savegame
 		star != StarManager.GetSol() &&
 		GetDistanceBetweenStars(GetCurrentStar(), star) < activeRadius) {
 
