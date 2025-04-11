@@ -1,9 +1,9 @@
-floats difficultyMeanOneSystem
+floats difficultyAvgOneSystem
 	14.0
 	12.0
 	8.0
 end
-floats difficultyMaxMean
+floats difficultyMaxAvg
 	60.0
 	40.0
 	30.0

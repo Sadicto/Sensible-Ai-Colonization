@@ -42,25 +42,6 @@ public:
 
 	static cEmpireExpansionManagerPtr Get();
 
-
-	// All methods have only been tested in space stage.
-	// Some methods that change stars or planets may not work correctly 
-	// if the player is on the planet or the star being changed.
-
-	/**
-	* @brief Gets the current star system the player is in.
-	* Preconditions: none.
-	* @return Pointer to the current star system (cStarRecord*).
-	*/
-	cStarRecord* GetCurrentStar();
-
-	/**
-	 * @brief Retrieves the empire that owns the current system.
-	 * Preconditions: system has an owner.
-	 * @return Pointer to the owning empire (cEmpire*).
-	 */
-	cEmpire* GetOwnerOfCurrentSystem();
-
 	/**
 	 * @brief Determines if a given planet is colonizable, meaning it is a terrestrial planet,
 	 * is not destroyed, and is not an adventure. (TODO check for 201 ruins planet)
@@ -72,14 +53,14 @@ public:
 
 	/**
 	 * @brief Calculates the colonization score of a planet,
-	 * with higher scores for larger terrascores,
+	 * with higher scores for a higher terrascore,
 	 * expensive spice, and T0 with green orbits,
 	 * and lower scores for moons.
 	 * Preconditions: none.
 	 * @param planet Pointer to the planet (cPlanetRecord*) to evaluate.
-	 * @return Integer score representing the colonization potential of the planet.
+	 * @return float score representing the colonization potential of the planet.
 	 */
-	int PlanetColonizationScore(cPlanetRecord* planet);
+	float PlanetColonizationScore(cPlanetRecord* planet);
 
 	/**
 	* @brief Determines if a given star system is colonizable, meaning it is a star,
@@ -95,8 +76,8 @@ public:
 
 	/**
 	 * Determines whether the given empire can colonize the specified star system.
-	 * A star is colonizable if ColonizableStar(star) returns true.
-	 * If the system contains civilizations or tribes, the empire must have a high enough level.
+	 * A star is colonizable if ColonizableStar(star) returns true and,
+	 * if the system contains civilizations or tribes, the empire must have a high enough level.
 	 */
 	bool EmpireCanColonizeStar(cEmpire* empire, cStarRecord* star);
 
@@ -198,7 +179,7 @@ public:
 
 	/**
 	 * @brief Calculates the probability of an empire expanding to new systems
-	 * based on its current number of stars. The process is explained in the definition.
+	 * based on its current number of stars.
 	 * Preconditions: none.
 	 * @param empire Pointer to the empire (cEmpire*) being evaluated.
 	 * @return Float between 0 and 1 representing the probability of expansion.
@@ -228,10 +209,10 @@ private:
 	float apexCantSystems;
 
 	// Represents the average cycles necessary for an empire to colonize its first system.
-	float meanOneSystem;
+	float avgOneSystem;
 
 	// The maximum average cycles necessary to colonize the next system, regardless of the number of colonies.
-	float maxMean;
+	float maxAvg;
 
 	// Average cycles necessary for an empire to reach apexCantSystems colonies.
 	float cyclesToApexColonies;

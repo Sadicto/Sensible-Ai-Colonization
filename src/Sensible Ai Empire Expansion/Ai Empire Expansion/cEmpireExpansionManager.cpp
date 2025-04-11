@@ -45,7 +45,7 @@ void cEmpireExpansionManager::Initialize() {
 
 	PropertyListPtr propList;
 
-	PropManager.GetPropertyList(id("Config"), id("SaeeConfig"), propList);
+	PropManager.GetPropertyList(id("Config"), id("SaieeConfig"), propList);
 
 	App::Property::GetFloat(propList.get(), 0x676FDB24, activeRadius);
 
@@ -105,15 +105,15 @@ void cEmpireExpansionManager::OnModeEntered(uint32_t previousModeID, uint32_t ne
 		Difficulty difficulty = player->mDifficultyLevel;
 
 		PropertyListPtr propList;
-		PropManager.GetPropertyList(id("Config"), id("SaeeConfig"), propList);
+		PropManager.GetPropertyList(id("Config"), id("SaieeConfig"), propList);
 
-		eastl::vector<float> rMeanOneSystem;
-		App::Property::GetArrayFloat(propList.get(), 0x5D39EA40, rMeanOneSystem);
-		meanOneSystem = rMeanOneSystem[difficulty];
+		eastl::vector<float> rAvgOneSystem;
+		App::Property::GetArrayFloat(propList.get(), 0xD525C7C1, rAvgOneSystem);
+		avgOneSystem = rAvgOneSystem[difficulty];
 
-		eastl::vector<float> rMaxMean;
-		App::Property::GetArrayFloat(propList.get(), 0xA1A4A55B, rMaxMean);
-		maxMean = rMaxMean[difficulty];
+		eastl::vector<float> rAvgMean;
+		App::Property::GetArrayFloat(propList.get(), 0x2EBFEBF8, rAvgMean);
+		maxAvg = rAvgMean[difficulty];
 
 		eastl::vector<float> rCyclesToApexColonies;
 		App::Property::GetArrayFloat(propList.get(), 0x67F6019E, rCyclesToApexColonies);
@@ -126,17 +126,6 @@ cEmpireExpansionManagerPtr cEmpireExpansionManager::Get() {
 	return instance;
 }
 
-cStarRecord* cEmpireExpansionManager::GetCurrentStar() {
-	cStarRecord* actualStar = SpacePlayerData::Get()->mpActiveStar.get()->mpStarRecord.get();
-	return actualStar;
-}
-
-cEmpire* cEmpireExpansionManager::GetOwnerOfCurrentSystem() {
-	cStarRecord* actualStar = GetCurrentStar();
-	cEmpire* empire = cStarManager::Get()->GetEmpireForStar(actualStar);
-	return empire;
-}
-
 bool cEmpireExpansionManager::ColonizablePlanet(cPlanetRecord* planet) { //TODO 201planet.
 	PlanetType type = planet->mType;
 	return ((type == PlanetType::T3 ||
@@ -147,13 +136,13 @@ bool cEmpireExpansionManager::ColonizablePlanet(cPlanetRecord* planet) { //TODO 
 		!planet->IsDestroyed()));
 }
 
-int cEmpireExpansionManager::PlanetColonizationScore(cPlanetRecord* planet) {
-    int score = 1;
+float cEmpireExpansionManager::PlanetColonizationScore(cPlanetRecord* planet) {
+    float score = 1;
 	//if habitable, more terrascore more points.
     if (planet->mType == PlanetType::T3 || 
         planet->mType == PlanetType::T2 ||
         planet->mType == PlanetType::T1) {
-        score = score + (static_cast<int>(planet->mType) * 10);
+        score = score + (static_cast<float>(planet->mType) * 10);
     }
 	//if T0, green orbit more points.
     else { 
@@ -193,7 +182,7 @@ int cEmpireExpansionManager::PlanetColonizationScore(cPlanetRecord* planet) {
 bool cEmpireExpansionManager::ColonizableStar(cStarRecord* star) { 
 
 	StarType type = star->GetType();
-	//a star, unclaimed, no monolith not Sol and near.
+	//a star, unclaimed, no monolith, not savegme, not Sol and near the player.
 	if (
 		type != StarType::GalacticCore &&
 		type != StarType::BlackHole &&
@@ -202,7 +191,7 @@ bool cEmpireExpansionManager::ColonizableStar(cStarRecord* star) {
 		(star->mFlags & (1 << 3)) == 0 && //no monolith
 		(star->mFlags & (1 << 1)) == 0 && //no savegame
 		star != StarManager.GetSol() &&
-		GetDistanceBetweenStars(GetCurrentStar(), star) < activeRadius) {
+		GetDistanceBetweenStars(GetActiveStarRecord(), star) < activeRadius) {
 
 		//at least one planet is colonizable.
 		for (cPlanetRecordPtr planet : star->GetPlanetRecords()) {
@@ -236,12 +225,12 @@ cPlanetRecordPtr cEmpireExpansionManager::BestColonizablePlanet(cStarRecord* sta
 	}
 
 	cPlanetRecordPtr bestPlanet = colonizablePlanets.front();
-	int bestScore = PlanetColonizationScore(bestPlanet.get());
+	float bestScore = PlanetColonizationScore(bestPlanet.get());
 	colonizablePlanets.erase(colonizablePlanets.begin());
 
 	//choose the best planet.
 	for (cPlanetRecordPtr planet : colonizablePlanets) {
-		int planetScore = PlanetColonizationScore(planet.get());
+		float planetScore = PlanetColonizationScore(planet.get());
 		if (planetScore > bestScore) {
 			bestPlanet = planet;
 			bestScore = planetScore;
@@ -344,19 +333,19 @@ void cEmpireExpansionManager::GetEmpiresInRadius(const Vector3& coords, float ra
 	eastl::vector<cStarRecordPtr> starsColonized;
 	StarManager.FindStars(coords, filter, starsColonized);
 
-	// a set prevents duplicates.
+	// Set prevents duplicates.
 	eastl::set<uint32_t> empireIDSet; 
 
 	uint32_t playerEmpireId = SpacePlayerData::Get()->mPlayerEmpireID;
 	uint32_t groxEmpireID = StarManager.GetGrobEmpireID();
 
-	// Collect unique mEmpireID values owners if the stars, except the grox and player empire.
+	// Collect unique mEmpireID owners of the stars, except the grox and player empire.
 	for (cStarRecordPtr star : starsColonized) {
 		if (star->mEmpireID != playerEmpireId && star->mEmpireID != groxEmpireID) {
 			empireIDSet.insert(star->mEmpireID);
 		}
 	}
-	//Get the empire for every id.
+	// Get the empire for every id.
 	for (uint32_t id : empireIDSet) {
 		empires.push_back(cEmpirePtr(StarManager.GetEmpire(id)));
 	}
@@ -394,33 +383,33 @@ void cEmpireExpansionManager::ExpandEmpire(cEmpire* empire) {
 	cStarRecordPtr candidateStar = NULL;
 
 	// Scores for each nearby colonizable star; the star with the highest score will be colonized.
-	eastl::map<cStarRecordPtr, float> starsScores;
+	eastl::map<cStarRecordPtr, float> starScores;
 
 	// Find all colonizable stars within nearStarRadius from each empireStar and calculate their score.
 	for (cStarRecordPtr empireStar : empireStars) {
 
 		eastl::vector<cStarRecordPtr> nearUnclaimedStars;
 		GetUnclaimedStarsInRadius(empireStar->mPosition, range, nearUnclaimedStars);
-		for (cStarRecordPtr nearStar : nearUnclaimedStars) {
+		for (cStarRecordPtr nearbyStar : nearUnclaimedStars) {
 			// Planets are needed in each candidate star for the algorithm to function properly.
-			StarManager.RequirePlanetsForStar(nearStar.get());
+			StarManager.RequirePlanetsForStar(nearbyStar.get());
 
 			// Check if the star is colonizable and the player is not currently in it.
-			if (EmpireCanColonizeStar(empire, nearStar.get()) && nearStar.get() != GetCurrentStar()) {
+			if (EmpireCanColonizeStar(empire, nearbyStar.get()) && nearbyStar.get() != GetActiveStarRecord()) {
 				// If the star is not in the map, add it and calculate its base score.
-				if (starsScores.count(nearStar) == 0) {
+				if (starScores.count(nearbyStar) == 0) {
 					// The further the star is from the homeworld, the lower the score.
-					starsScores[nearStar] = StarColonizationScore(nearStar.get()) / (GetDistanceBetweenStars(homeworld, nearStar.get()) * 2);
+					starScores[nearbyStar] = StarColonizationScore(nearbyStar.get()) / (GetDistanceBetweenStars(homeworld, nearbyStar.get()) * 2);
 				}
 				else {
 					// If the star is already in the map, it means it's close to multiple stars, so increase its score.
-					starsScores[nearStar] *= 2;
+					starScores[nearbyStar] *= 2;
 				}
 			}
 		}
 		float maxScore = -1;
 		// find the Star with the highest Score.
-		for (const auto& pair : starsScores) {
+		for (const auto& pair : starScores) {
 			if (pair.second > maxScore) {
 				maxScore = pair.second;
 				candidateStar = pair.first;
@@ -445,31 +434,31 @@ float cEmpireExpansionManager::EmpireExpansionProbability(cEmpire* empire) {
 	// 1 + 2 + 3 + .... i, needed to calculate meanDiff.
 	float total_sum_i = ((apexCantSystems - 1) * apexCantSystems) / 2;
 
-	// The difference of mean between i and i + 1 systems.
-	float meanDiff = std::abs((cyclesToApexColonies - meanOneSystem * (apexCantSystems - 1)) / total_sum_i);
+	// The difference of avg between i and i + 1 systems.
+	float avgDifference = std::abs((cyclesToApexColonies - avgOneSystem * (apexCantSystems - 1)) / total_sum_i);
 
-	float cantSystems = empire->mStars.size();
+	float cantSystems =static_cast<float>(empire->mStars.size());
 
 	// the average wait given cantSystems
 	float averageForCantSystems;
 
 	// If the empire has more systems than the apex, use meanDiff to increase the average wait cycles.
 	if (cantSystems > apexCantSystems) { 
-		averageForCantSystems = meanOneSystem + (cantSystems + ((cantSystems - apexCantSystems) * 2) - apexCantSystems * 2) * meanDiff;
+		averageForCantSystems = avgOneSystem + (cantSystems + ((cantSystems - apexCantSystems) * 2) - apexCantSystems * 2) * avgDifference;
 	}
 	// If it has fewer systems, decrease the average.
 	else {
-		averageForCantSystems = meanOneSystem - (cantSystems - 1) * meanDiff; 
+		averageForCantSystems = avgOneSystem - (cantSystems - 1) * avgDifference; 
 	}
 	// In this distribution, p is 1/average; we use the maxMean to ensure the probability never gets too low.
-	return std::max(1 / averageForCantSystems, 1 / maxMean); 
+	return std::max(1 / averageForCantSystems, 1 / maxAvg); 
 }
 
 void cEmpireExpansionManager::EmpiresExpansionCycle() {
 	// Only empires within activeRadius parsecs can expand.
 	eastl::vector <cEmpirePtr> nearEmpires;
 
-	GetEmpiresInRadius(GetCurrentStar()->mPosition, activeRadius, nearEmpires);
+	GetEmpiresInRadius(GetActiveStarRecord()->mPosition, activeRadius, nearEmpires);
 	// For each nearby empire, calculate pOfExpansion and expand it based on the probability.
 	for (cEmpirePtr empire : nearEmpires) {
 		float pOfExpansion = EmpireExpansionProbability(empire.get());
