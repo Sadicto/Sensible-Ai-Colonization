@@ -3,15 +3,15 @@
 #include <Spore\BasicIncludes.h>
 #include <Spore/Simulator/Serialization.h>
 
-#define cEmpireExpansionManagerPtr intrusive_ptr<cEmpireExpansionManager>
+#define cEmpireColonizationManagerPtr intrusive_ptr<cEmpireColonizationManager>
 
 using namespace Simulator;
 
-class cEmpireExpansionManager
+class cEmpireColonizationManager
 	: public Simulator::cStrategy
 {
 public:
-	static const uint32_t TYPE = id("AiEmpireExpansion::cEmpireExpansionManager");
+	static const uint32_t TYPE = id("AiEmpireColonization::cEmpireColonizationManager");
 	static const uint32_t NOUN_ID = TYPE;
 
 	int AddRef() override;
@@ -40,7 +40,7 @@ public:
 	// You can add more methods here
 	//
 
-	static cEmpireExpansionManagerPtr Get();
+	static cEmpireColonizationManagerPtr Get();
 
 	/**
 	 * @brief Determines if a given planet is colonizable, meaning it is a terrestrial planet,
@@ -186,17 +186,17 @@ public:
 	void ExpandEmpire(cEmpire* empire);
 
 	/**
-	 * @brief Calculates the probability of an empire expanding to new systems
+	 * @brief Calculates the probability of an empire colonizing a new system
 	 * based on its current number of stars.
 	 * Preconditions: none.
 	 * @param empire Pointer to the empire (cEmpire*) being evaluated.
-	 * @return Float between 0 and 1 representing the probability of expansion.
+	 * @return Float between 0 and 1 representing the probability of colonization.
 	 */
-	float EmpireExpansionProbability(cEmpire* empire);
+	float EmpireColonizationProbability(cEmpire* empire);
 
 	/**
 	 * @brief Executes one cycle of the manager, expanding nearby empires
-	 * according to EmpireExpansionProbability(empire).
+	 * according to EmpireColonizationProbability(empire).
 	 * Preconditions: none.
 	 */
 	void EmpiresExpansionCycle();
@@ -205,7 +205,7 @@ public:
 private:
 
 	
-	static cEmpireExpansionManagerPtr instance;
+	static cEmpireColonizationManagerPtr instance;
 
 	// Radius (in parsecs) in which empires colonize systems
 	float activeRadius;
@@ -222,7 +222,7 @@ private:
 	// The maximum average cycles necessary to colonize the next system, regardless of the number of colonies.
 	float maxAvg;
 
-	// Average cycles necessary for an empire to reach apexCantSystems colonies.
+	// Average cycles necessary for an empire to reach apexNumSystems colonies.
 	float cyclesToApexColonies;
 
 	// Colonization range per empire level, in parsecs.

@@ -5,11 +5,11 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Ai Empire Expansion">
-      <UniqueIdentifier>{3880d018-2395-4502-abfe-4b83e0817aab}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Internal">
       <UniqueIdentifier>{d62ad12d-69d8-4933-8342-03043c9adc22}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Ai Empire Colonization">
+      <UniqueIdentifier>{3880d018-2395-4502-abfe-4b83e0817aab}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -19,19 +19,19 @@
     <ClInclude Include="stdafx.h">
       <Filter>Internal</Filter>
     </ClInclude>
-    <ClInclude Include="cEmpireExpansionManager.h">
-      <Filter>Ai Empire Expansion</Filter>
+    <ClInclude Include="cEmpireColonizationManager.h">
+      <Filter>Ai Empire Colonization</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
-      <Filter>Ai Empire Expansion</Filter>
+      <Filter>Ai Empire Colonization</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>Internal</Filter>
     </ClCompile>
-    <ClCompile Include="cEmpireExpansionManager.cpp">
-      <Filter>Ai Empire Expansion</Filter>
+    <ClCompile Include="cEmpireColonizationManager.cpp">
+      <Filter>Ai Empire Colonization</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

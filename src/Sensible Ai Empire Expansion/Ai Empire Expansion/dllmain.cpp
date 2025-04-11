@@ -1,11 +1,11 @@
 // dllmain.cpp : Defines the entry point for the DLL application.
 #include "stdafx.h"
-#include "cEmpireExpansionManager.h"
+#include "cEmpireColonizationManager.h"
 
 void Initialize()
 {
-	//ModAPI::AddSimulatorStrategy(system, cEmpireExpansionManager::NOUN_ID);
-	cSimulatorSystem::Get()->AddStrategy(new cEmpireExpansionManager(), cEmpireExpansionManager::NOUN_ID);
+	//ModAPI::AddSimulatorStrategy(system, cEmpireColonizationManager::NOUN_ID);
+	cSimulatorSystem::Get()->AddStrategy(new cEmpireColonizationManager(), cEmpireColonizationManager::NOUN_ID);
 }
 
 void Dispose()
