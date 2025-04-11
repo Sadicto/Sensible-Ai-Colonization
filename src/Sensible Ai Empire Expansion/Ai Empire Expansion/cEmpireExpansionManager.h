@@ -32,7 +32,7 @@ public:
 
 	void Update(int deltaTime, int deltaGameTime) override;
 	// Inherited via cStrategy
-	
+
 	void OnModeEntered(uint32_t previousModeID, uint32_t newModeID) override;
 
 	static Simulator::Attribute ATTRIBUTES[];
@@ -64,8 +64,8 @@ public:
 
 	/**
 	* @brief Determines if a given star system is colonizable, meaning it is a star,
-	* has no owning empire (tribes and civilizations do not count), has no monolith 
-	* is not a save, not sol, contains at least one colonizable planet and 
+	* has no owning empire (tribes and civilizations do not count), has no monolith
+	* is not a save, not sol, contains at least one colonizable planet and
 	* is at most activeRadius parsecs from the player
 	* Preconditions: none.
 	* @param star Pointer to the star system (cStarRecord*) to check for colonization.
@@ -167,6 +167,14 @@ public:
 	float GetDistanceBetweenStars(cStarRecord* star1, cStarRecord* star2);
 
 	/**
+	* @brief returns the power level of an empire
+	* defined by its number of stars.
+	* Preconditions: none.
+	* @param empire pointer to the empire
+	*/
+	int GetEmpireLevel(cEmpire* empire);
+
+	/**
 	* @brief Expands the empire to a new star system,
 	* prioritizing those closer to the homeworld, other colonies,
 	* and a higher StarColonizationScore(Star).
@@ -206,7 +214,7 @@ private:
 	int cycleInterval;
 
 	// Number of systems that maximize the probability of expansion in a cycle.
-	float apexCantSystems;
+	float apexNumSystems;
 
 	// Represents the average cycles necessary for an empire to colonize its first system.
 	float avgOneSystem;

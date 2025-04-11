@@ -51,7 +51,7 @@ void cEmpireExpansionManager::Initialize() {
 
 	App::Property::GetInt32(propList.get(), 0x964CF55A, cycleInterval);
 
-	App::Property::GetFloat(propList.get(), 0xDF83E9A3, apexCantSystems);
+	App::Property::GetFloat(propList.get(), 0x56BC006B, apexNumSystems);
 
 	App::Property::GetInt32(propList.get(), 0xD226209D, levelToColonizeTribe);
 
@@ -205,7 +205,7 @@ bool cEmpireExpansionManager::ColonizableStar(cStarRecord* star) {
 
 bool cEmpireExpansionManager::EmpireCanColonizeStar(cEmpire* empire, cStarRecord* star){
 	TechLevel techLevel = star->GetTechLevel();
-	int empireLevel = empire->field_D8;
+	int empireLevel = GetEmpireLevel(empire);
 
 	return ColonizableStar(star) 
 		&& (techLevel == TechLevel::None || techLevel == TechLevel::Creature
@@ -376,9 +376,28 @@ float cEmpireExpansionManager::GetDistanceBetweenStars(cStarRecord* star1, cStar
 	return (star1->mPosition - star2->mPosition).Length();
 }
 
+int cEmpireExpansionManager::GetEmpireLevel(cEmpire* empire) { // TODO read prop with the power levels and calculate it that way.
+	int numSystems = empire->mStars.size();
+	if (numSystems <= 3) {
+		return 0;
+	}
+	else if (numSystems <= 5) {
+		return 1;
+	}
+	else if (numSystems <= 8) {
+		return 2;
+	}
+	else if (numSystems <= 12) {
+		return 3;
+	}
+	else {
+		return 4;
+	}
+}
+
 void cEmpireExpansionManager::ExpandEmpire(cEmpire* empire) {
 	cStarRecord* homeworld = empire->GetHomeStarRecord();
-	float range = colonizationRange[empire->field_D8];
+	float range = colonizationRange[GetEmpireLevel(empire)];
 	eastl::vector<cStarRecordPtr> empireStars = empire->mStars;
 	cStarRecordPtr candidateStar = NULL;
 
@@ -432,26 +451,26 @@ void cEmpireExpansionManager::ExpandEmpire(cEmpire* empire) {
 float cEmpireExpansionManager::EmpireExpansionProbability(cEmpire* empire) {
 
 	// 1 + 2 + 3 + .... i, needed to calculate meanDiff.
-	float total_sum_i = ((apexCantSystems - 1) * apexCantSystems) / 2;
+	float total_sum_i = ((apexNumSystems - 1) * apexNumSystems) / 2;
 
 	// The difference of avg between i and i + 1 systems.
-	float avgDifference = std::abs((cyclesToApexColonies - avgOneSystem * (apexCantSystems - 1)) / total_sum_i);
+	float avgDifference = std::abs((cyclesToApexColonies - avgOneSystem * (apexNumSystems - 1)) / total_sum_i);
 
-	float cantSystems =static_cast<float>(empire->mStars.size());
+	float numSystems =static_cast<float>(empire->mStars.size());
 
-	// the average wait given cantSystems
-	float averageForCantSystems;
+	// the average wait given numSystems
+	float averageForNumSystems;
 
 	// If the empire has more systems than the apex, use meanDiff to increase the average wait cycles.
-	if (cantSystems > apexCantSystems) { 
-		averageForCantSystems = avgOneSystem + (cantSystems + ((cantSystems - apexCantSystems) * 2) - apexCantSystems * 2) * avgDifference;
+	if (numSystems > apexNumSystems) { 
+		averageForNumSystems = avgOneSystem + (numSystems + ((numSystems - apexNumSystems) * 2) - apexNumSystems * 2) * avgDifference;
 	}
 	// If it has fewer systems, decrease the average.
 	else {
-		averageForCantSystems = avgOneSystem - (cantSystems - 1) * avgDifference; 
+		averageForNumSystems = avgOneSystem - (numSystems - 1) * avgDifference; 
 	}
 	// In this distribution, p is 1/average; we use the maxMean to ensure the probability never gets too low.
-	return std::max(1 / averageForCantSystems, 1 / maxAvg); 
+	return std::max(1 / averageForNumSystems, 1 / maxAvg); 
 }
 
 void cEmpireExpansionManager::EmpiresExpansionCycle() {
