@@ -99,6 +99,21 @@ void cEmpireColonizationManager::Update(int deltaTime, int deltaGameTime) {
 
 void cEmpireColonizationManager::OnModeEntered(uint32_t previousModeID, uint32_t newModeID) {
 	if (newModeID == GameModeIDs::kGameSpace) {
+
+		// Cleanup of the mess of the 1.0.0.
+		eastl::vector<int> field = StarManager.field_3C;
+		eastl::vector<cStar*>& starVector = *reinterpret_cast<eastl::vector<cStar*>*>(&field);
+		for (auto it = starVector.begin(); it != starVector.end(); ) {
+			cStar* star = *it;
+			if (star->mpStarRecord == nullptr) {
+				star->mpStarRecord = StarManager.GetStarRecord(0);
+				//GameNounManager.DestroyInstance(star);
+				//it = starVector.erase(it);
+			}
+			else {
+				++it;
+			}
+		}
 		elapsedTime = 0;
 
 		cPlayer* player = GameNounManager.GetPlayer();
@@ -302,6 +317,7 @@ void cEmpireColonizationManager::GeneratePlanets(cStarRecord* star) {
 	cStar* starT = simulator_new<cStar>();
 	starT->mpStarRecord = star;
 	starT->GetSolarSystem();
+	GameNounManager.DestroyInstance(starT);
 }
 
 void cEmpireColonizationManager::ColonizeStarSystem(cEmpire* empire, cStarRecord* star) {
