@@ -7,9 +7,9 @@ string8s NPCActionRulesColonise
 	"0 outpost -color Red" #"2 outpost -color Red" 
 	"1 upgrade -color Red"
 	"0 nice -nearMe 2 -enemy 3 -player 2 -ally -99 -empireStars 0.5"
-	"0 attack "#-color Blue -nearMe 1 -player 1 -enemy 9 -ally -99"
-	#"0 attack -color Yellow -nearMe 1 -player 1 -enemy 8 -ally -99"
-	#"0 attack -color Red -nearMe 1 -player 1 -enemy 7 -ally -99"
+	"0 attack -color Blue -nearMe 1 -player 1 -enemy 9 -ally -99"
+	"0 attack -color Yellow -nearMe 1 -player 1 -enemy 8 -ally -99"
+	"0 attack -color Red -nearMe 1 -player 1 -enemy 7 -ally -99"
 end
 string8s NPCActionRulesEconomic
 	"0 outpost -color Red" #"8 outpost -color Red -nearMe -1 -nearEnemy -1 -nearAlly -1 -nearNeutral 1"
@@ -29,9 +29,9 @@ string8s NPCActionRulesMilitary
 	"0 outpost -color Red"#"1 outpost -color Red -nearMe -1"
 	"0 outpost -color Red"#"1 outpost -color Red"
 	"0 nice -nearMe 2 -enemy 3 -ally -99"
-	"0 attack "#-color Blue -nearMe 1 -player 1 -enemy 9 -ally -99"
-	#"0 attack -color Yellow -nearMe 1 -player 1 -enemy 8 -ally -99"
-	#"0 attack -color Red -nearMe 1 -player 1 -enemy 7 -ally -99"
+	"0 attack -color Blue -nearMe 1 -player 1 -enemy 9 -ally -99"
+	"0 attack -color Yellow -nearMe 1 -player 1 -enemy 8 -ally -99"
+	"0 attack -color Red -nearMe 1 -player 1 -enemy 7 -ally -99"
 end
 int32 NPCForcedTurnCount 0
 int32s attackWeightsNormal

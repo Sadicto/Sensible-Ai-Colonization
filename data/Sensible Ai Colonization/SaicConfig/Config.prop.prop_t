@@ -19,10 +19,10 @@ float apexNumSystems 13.0
 
 floats empireColonizationRange
 	3.0
-	5.0#4.0
-	6.0#5.0
-	7.0#6.0
-	8.0#7.0
+	4.0
+	5.0
+	6.0
+	7.0
 end
 
 int32 levelToColonizeTribe 1
