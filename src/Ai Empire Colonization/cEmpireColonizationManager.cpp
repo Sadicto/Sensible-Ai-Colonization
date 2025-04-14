@@ -393,6 +393,7 @@ float cEmpireColonizationManager::GetDistanceBetweenStars(cStarRecord* star1, cS
 }
 
 int cEmpireColonizationManager::GetEmpireLevel(cEmpire* empire) { // TODO read prop with the power levels and calculate it that way.
+	/*
 	int numSystems = empire->mStars.size();
 	if (numSystems <= 3) {
 		return 0;
@@ -408,7 +409,8 @@ int cEmpireColonizationManager::GetEmpireLevel(cEmpire* empire) { // TODO read p
 	}
 	else {
 		return 4;
-	}
+	}*/
+	return empire->field_D8;
 }
 
 void cEmpireColonizationManager::ExpandEmpire(cEmpire* empire) {
