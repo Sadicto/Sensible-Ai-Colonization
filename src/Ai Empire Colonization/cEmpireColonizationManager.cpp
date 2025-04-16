@@ -43,9 +43,13 @@ cEmpireColonizationManagerPtr cEmpireColonizationManager::instance = nullptr;
 void cEmpireColonizationManager::Initialize() {
 	instance = cEmpireColonizationManagerPtr(this);
 
+	eastl::vector<ResourceKey> speedConfigs;
+
 	PropertyListPtr propList;
 
 	PropManager.GetPropertyList(id("Config"), id("SaicConfig"), propList);
+	
+	// General configuration.
 
 	App::Property::GetFloat(propList.get(), 0x676FDB24, activeRadius);
 
@@ -58,6 +62,25 @@ void cEmpireColonizationManager::Initialize() {
 	App::Property::GetInt32(propList.get(), 0xBEE4774B, levelToColonizeCiv);
 
 	App::Property::GetArrayFloat(propList.get(), 0xDFC93C59, colonizationRange);
+
+	App::Property::GetArrayKey(propList.get(), 0x5A2D3987, speedConfigs);
+
+	// Speed configuration.
+
+	for (ResourceKey const &key : speedConfigs) {
+		bool found = PropManager.GetPropertyList(key.instanceID, key.groupID, propList);
+		if (found) { // Only one speedConfig was installed; we just have to find out which one it is.
+
+			App::Property::GetFloat(propList.get(), 0xD525C7C1, avgOneSystem);
+
+			App::Property::GetFloat(propList.get(), 0x2EBFEBF8, maxAvg);
+
+			App::Property::GetFloat(propList.get(), 0x67F6019E, cyclesToApexColonies);
+
+			break;
+		}
+	}
+	// TODO print in console if no speedConfig was found.
 
 	elapsedTime = 0;
 
@@ -115,7 +138,7 @@ void cEmpireColonizationManager::OnModeEntered(uint32_t previousModeID, uint32_t
 			}
 		}
 		elapsedTime = 0;
-
+		/*
 		cPlayer* player = GameNounManager.GetPlayer();
 		Difficulty difficulty = player->mDifficultyLevel;
 
@@ -133,6 +156,7 @@ void cEmpireColonizationManager::OnModeEntered(uint32_t previousModeID, uint32_t
 		eastl::vector<float> rCyclesToApexColonies;
 		App::Property::GetArrayFloat(propList.get(), 0x67F6019E, rCyclesToApexColonies);
 		cyclesToApexColonies = rCyclesToApexColonies[difficulty];
+		*/
 	}
 	cStrategy::OnModeEntered(previousModeID, newModeID); //idk if it is necessary.
 }
