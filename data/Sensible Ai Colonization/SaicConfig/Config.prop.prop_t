@@ -1,6 +1,6 @@
 float activeRadious 30.0
 int32 cycleInterval 30000
-float apexNumSystems 13.0
+float targetNumSystems 13.0
 
 floats empireColonizationRange
 	3.0
@@ -14,9 +14,11 @@ int32 levelToColonizeTribe 1
 int32 levelToColonizeCiv 3
 
 keys speedConfigs
+	SaicConfig!ExtremelyFastSpeedConfig.prop
 	SaicConfig!VeryFastSpeedConfig.prop
 	SaicConfig!FastSpeedConfig.prop
 	SaicConfig!NormalSpeedConfig.prop
 	SaicConfig!SlowSpeedConfig.prop
 	SaicConfig!VerySlowSpeedConfig.prop
+	SaicConfig!ExtremelySlowSpeedConfig.prop
 end

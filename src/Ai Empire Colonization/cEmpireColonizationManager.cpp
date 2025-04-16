@@ -55,7 +55,7 @@ void cEmpireColonizationManager::Initialize() {
 
 	App::Property::GetInt32(propList.get(), 0x964CF55A, cycleInterval);
 
-	App::Property::GetFloat(propList.get(), 0x56BC006B, apexNumSystems);
+	App::Property::GetFloat(propList.get(), 0x98199E80, targetNumSystems);
 
 	App::Property::GetInt32(propList.get(), 0xD226209D, levelToColonizeTribe);
 
@@ -71,11 +71,7 @@ void cEmpireColonizationManager::Initialize() {
 		bool found = PropManager.GetPropertyList(key.instanceID, key.groupID, propList);
 		if (found) { // Only one speedConfig was installed; we just have to find out which one it is.
 
-			App::Property::GetFloat(propList.get(), 0xD525C7C1, avgOneSystem);
-
-			App::Property::GetFloat(propList.get(), 0x2EBFEBF8, maxAvg);
-
-			App::Property::GetFloat(propList.get(), 0x67F6019E, cyclesToApexColonies);
+			App::Property::GetFloat(propList.get(), 0x79288FD9, cyclesToTargetColonies);
 
 			break;
 		}
@@ -138,25 +134,6 @@ void cEmpireColonizationManager::OnModeEntered(uint32_t previousModeID, uint32_t
 			}
 		}
 		elapsedTime = 0;
-		/*
-		cPlayer* player = GameNounManager.GetPlayer();
-		Difficulty difficulty = player->mDifficultyLevel;
-
-		PropertyListPtr propList;
-		PropManager.GetPropertyList(id("Config"), id("SaicConfig"), propList);
-
-		eastl::vector<float> rAvgOneSystem;
-		App::Property::GetArrayFloat(propList.get(), 0xD525C7C1, rAvgOneSystem);
-		avgOneSystem = rAvgOneSystem[difficulty];
-
-		eastl::vector<float> rAvgMean;
-		App::Property::GetArrayFloat(propList.get(), 0x2EBFEBF8, rAvgMean);
-		maxAvg = rAvgMean[difficulty];
-
-		eastl::vector<float> rCyclesToApexColonies;
-		App::Property::GetArrayFloat(propList.get(), 0x67F6019E, rCyclesToApexColonies);
-		cyclesToApexColonies = rCyclesToApexColonies[difficulty];
-		*/
 	}
 	cStrategy::OnModeEntered(previousModeID, newModeID); //idk if it is necessary.
 }
@@ -489,28 +466,7 @@ void cEmpireColonizationManager::ExpandEmpire(cEmpire* empire) {
 }
 
 float cEmpireColonizationManager::EmpireColonizationProbability(cEmpire* empire) {
-
-	// 1 + 2 + 3 + .... i, needed to calculate meanDiff.
-	float total_sum_i = ((apexNumSystems - 1) * apexNumSystems) / 2;
-
-	// The difference of avg between i and i + 1 systems.
-	float avgDifference = std::abs((cyclesToApexColonies - avgOneSystem * (apexNumSystems - 1)) / total_sum_i);
-
-	float numSystems =static_cast<float>(empire->mStars.size());
-
-	// the average wait given numSystems
-	float averageForNumSystems;
-
-	// If the empire has more systems than the apex, use meanDiff to increase the average wait cycles.
-	if (numSystems > apexNumSystems) { 
-		averageForNumSystems = avgOneSystem + (numSystems + ((numSystems - apexNumSystems) * 2) - apexNumSystems * 2) * avgDifference;
-	}
-	// If it has fewer systems, decrease the average.
-	else {
-		averageForNumSystems = avgOneSystem - (numSystems - 1) * avgDifference; 
-	}
-	// In this distribution, p is 1/average; we use the maxMean to ensure the probability never gets too low.
-	return std::max(1 / averageForNumSystems, 1 / maxAvg); 
+	return targetNumSystems / cyclesToTargetColonies;
 }
 
 void cEmpireColonizationManager::EmpiresExpansionCycle() {

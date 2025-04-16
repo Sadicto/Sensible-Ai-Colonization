@@ -1,19 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<mod description="Improves AI empire colonization logic for more natural and strategic expansion." displayName="Sensible Ai Colonization" dllsBuild="$SPOREMOD_DLLS_BUILD" githubUrl="https://github.com/Sadicto/Sensible-Ai-Colonization" hasCustomInstaller="true" installerSystemVersion="1.0.1.2" isExperimental="$SPOREMOD_EXPERIMENTAL" unique="SensibleAiColonization" websiteUrl="https://github.com/Sadicto/Sensible-Ai-Colonization">
+<mod description="This mod improves how AI empires expand in the Space Stage. Instead of random or unrealistic expansion, empires now prioritize colonizing nearby star systems, especially those with habitable planets and valuable spice. As the empire grows, it focuses on filling in gaps near existing colonies. Within each star system, the AI always chooses the best available planet for colonization based on habitability and spice value." displayName="Sensible Ai Colonization" dllsBuild="$SPOREMOD_DLLS_BUILD" githubUrl="https://github.com/Sadicto/Sensible-Ai-Colonization" hasCustomInstaller="true" installerSystemVersion="1.0.1.2" isExperimental="$SPOREMOD_EXPERIMENTAL" unique="SensibleAiColonization" websiteUrl="https://github.com/Sadicto/Sensible-Ai-Colonization">
   <componentGroup displayName="AI Colonization Speed" unique="SensibleAiColonization_Speed_Config">
-    <component game="GalacticAdventures" displayName="Very Slow" description="On average, empires will take 3 hours to reach 13 systems." unique ="SensibleAIColonization_VerySlowSpeed_Config" defaultChecked="false">SensibleAIColonization_VerySlowSpeed_Config.package</component>
-    <component game="GalacticAdventures" displayName="Slow" description="On average, empires will take 2 hours to reach 13 systems." unique ="SensibleAIColonization_SlowSpeed_Config" defaultChecked="false">SensibleAIColonization_SlowSpeed_Config.package</component>
-    <component game="GalacticAdventures" displayName="Normal" description="On average, empires will take 1 hour and 30 minutes to reach 13 systems." unique ="SensibleAIColonization_NormalSpeed_Config" defaultChecked="true">SensibleAIColonization_NormalSpeed_Config.package</component>
-    <component game="GalacticAdventures" displayName="Fast" description="On average, empires will take 1 hour to reach 13 systems." unique ="SensibleAIColonization_FastSpeed_Config" defaultChecked="false">SensibleAIColonization_FastSpeed_Config.package</component>
-    <component game="GalacticAdventures" displayName="Very Fast" description = "On average, empires will take 40 minutes to reach 13 systems." unique="SensibleAIColonization_VeryFastSpeed_Config" defaultChecked="false">SensibleAIColonization_VeryFastSpeed_Config.package</component>
+    <component game="GalacticAdventures" displayName="Extremely Slow Expansion" description="On average, empires will take 5 hours to reach 13 systems." unique ="SensibleAIColonization_ExtremelySlowSpeed_Config" defaultChecked="false">SensibleAIColonization_ExtremelySlowSpeed_Config.package</component>
+    <component game="GalacticAdventures" displayName="Very Slow Expansion" description="On average, empires will take 3 hours to reach 13 systems." unique ="SensibleAIColonization_VerySlowSpeed_Config" defaultChecked="false">SensibleAIColonization_VerySlowSpeed_Config.package</component>
+    <component game="GalacticAdventures" displayName="Slow Expansion" " description="On average, empires will take 2 hours to reach 13 systems." unique ="SensibleAIColonization_SlowSpeed_Config" defaultChecked="false">SensibleAIColonization_SlowSpeed_Config.package</component>
+    <component game="GalacticAdventures" displayName="Normal Expansion" " description="On average, empires will take 1 hour and 30 minutes to reach 13 systems." unique ="SensibleAIColonization_NormalSpeed_Config" defaultChecked="true">SensibleAIColonization_NormalSpeed_Config.package</component>
+    <component game="GalacticAdventures" displayName="Fast Expansion" " description="On average, empires will take 1 hour to reach 13 systems." unique ="SensibleAIColonization_FastSpeed_Config" defaultChecked="false">SensibleAIColonization_FastSpeed_Config.package</component>
+    <component game="GalacticAdventures" displayName="Very Fast Expansion" " description = "On average, empires will take 40 minutes to reach 13 systems." unique="SensibleAIColonization_VeryFastSpeed_Config" defaultChecked="false">SensibleAIColonization_VeryFastSpeed_Config.package</component>
+    <component game="GalacticAdventures" displayName="Extremely Fast Expansion" " description = "On average, empires will take 30 minutes to reach 13 systems." unique="SensibleAIColonization_ExtremelyFastSpeed_Config" defaultChecked="false">SensibleAIColonization_ExtremelyFastSpeed_Config.package</component>
   </componentGroup>
   <prerequisite game="GalacticAdventures">SensibleAIColonization_Main.package</prerequisite>
   <prerequisite>Ai Empire Colonization.dll</prerequisite>
   <remove game="GalacticAdventures">SensibleAIColonization_Main.package</remove>
   <remove>Ai Empire Colonization.dll</remove>
+  <remove game="GalacticAdventures">SensibleAIColonization_ExtremelySlowSpeed_Config.package</remove>
   <remove game="GalacticAdventures">SensibleAIColonization_VerySlowSpeed_Config.package</remove>
   <remove game="GalacticAdventures">SensibleAIColonization_SlowSpeed_Config.package</remove>
   <remove game="GalacticAdventures">SensibleAIColonization_NormalSpeed_Config.package</remove>
   <remove game="GalacticAdventures">SensibleAIColonization_FastSpeed_Config.package</remove>
   <remove game="GalacticAdventures">SensibleAIColonization_VeryFastSpeed_Config.package</remove>
+  <remove game="GalacticAdventures">SensibleAIColonization_ExtremelyFastSpeed_Config.package</remove>
 </mod>

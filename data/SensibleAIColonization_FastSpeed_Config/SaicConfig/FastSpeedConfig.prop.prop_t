@@ -1,3 +1,1 @@
-float difficultyAvgOneSystem 12.0
-float difficultyMaxAvg 40.0
-float difficultyCyclesToApexColonies 120.0
+float difficultyCyclesToTargetColonies 120.0
