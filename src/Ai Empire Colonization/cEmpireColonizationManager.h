@@ -120,8 +120,32 @@ public:
 	*/
 	SolarSystemOrbitTemperature GetPlanetOrbitTemperature(cPlanetRecord* planet);
 
-	//
-	/*
+	bool CompletePlanetPlantEcosystem(cPlanetRecord* planet);
+
+	bool CompletePlanetAnimalEcosystem(cPlanetRecord* planet);
+
+	bool CompletePlanetEcosystem(cPlanetRecord* planet);
+
+	/**
+	 * @brief Populates the planet's plant species based on the maximum capacity determined by the terrascore.
+	 * @param planet Pointer to the planet record whose plants will be populated.
+	 */
+	void FillPlanetPlants(cPlanetRecord* planet);
+
+	/**
+	 * @brief Populates the planet's creature species based on the maximum capacity determined by the terrascore.
+	 * @param planet Pointer to the planet record whose creatures will be populated.
+	 */
+	void FillPlanetCreatures(cPlanetRecord* planet);
+
+	/**
+	 * @brief Populates the planet's ecosystem with both plant and creature species based on the maximum capacity determined by the terrascore.
+	 * @param planet Pointer to the planet record whose ecosystem will be populated.
+	 */
+	void FillPlanetEcosystem(cPlanetRecord* planet);
+
+	
+	/**
 	*  @brief Assign spices to all planets in the stars and generates its orbits.
 	* Preconditions: none.
 	* @param star The star system in which the planets will be generated

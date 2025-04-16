@@ -312,12 +312,77 @@ SolarSystemOrbitTemperature cEmpireColonizationManager::GetPlanetOrbitTemperatur
 	}
 }
 
+bool cEmpireColonizationManager::CompletePlanetPlantEcosystem(cPlanetRecord* planet) {
+	PlanetType planetType = planet->mType;
+	int plantSpeciesNum = planet->mPlantSpecies.size();
+	return (planetType == PlanetType::T0) || 
+		(planetType == PlanetType::T1 && plantSpeciesNum == 3)||
+		(planetType == PlanetType::T2 && plantSpeciesNum == 6)||
+		(planetType == PlanetType::T3 && plantSpeciesNum == 9);
+}
+
+bool cEmpireColonizationManager::CompletePlanetAnimalEcosystem(cPlanetRecord* planet) {
+	PlanetType planetType = planet->mType;
+	int animalSpeciesNum = planet->mAnimalSpecies.size();
+	return (planetType == PlanetType::T0) || 
+		(planetType == PlanetType::T1 && animalSpeciesNum == 3) ||
+		(planetType == PlanetType::T2 && animalSpeciesNum == 6) ||
+		(planetType == PlanetType::T3 && animalSpeciesNum == 9);
+}
+
+bool cEmpireColonizationManager::CompletePlanetEcosystem(cPlanetRecord* planet) {
+	return CompletePlanetPlantEcosystem(planet) && CompletePlanetAnimalEcosystem(planet);
+}
+
+void cEmpireColonizationManager::FillPlanetPlants(cPlanetRecord* planet) {
+	if ((planet->mType == PlanetType::T3 ||
+		planet->mType == PlanetType::T2 ||
+		planet->mType == PlanetType::T1) &&
+		!CompletePlanetPlantEcosystem(planet)) {
+		ResourceKey terrainScript = planet->GetGeneratedTerrainKey();
+		eastl::vector<ResourceKey> scriptPlants;
+		StarManager.GetPlantsByTerrainScript(&terrainScript, &scriptPlants);
+
+		int planetTerrascore = static_cast<int>(planet->mType) - 2;
+		StarManager.GeneratePlanetPlants(&scriptPlants, planetTerrascore, planetTerrascore - 1, 3, 0, &planet->mPlantSpecies);
+	}
+}
+
+void cEmpireColonizationManager::FillPlanetCreatures(cPlanetRecord* planet) {
+	if ((planet->mType == PlanetType::T3 ||
+		planet->mType == PlanetType::T2 ||
+		planet->mType == PlanetType::T1) &&
+		!CompletePlanetAnimalEcosystem(planet)) {
+
+		int planetTerrascore = static_cast<int>(planet->mType) - 2;
+		eastl::vector<ResourceKey> priorityCreatures; // empty, we don't care about specific creatures.
+		StarManager.GeneratePlanetCreatures(&priorityCreatures, planetTerrascore, planetTerrascore - 1, 3, 0, &planet->mAnimalSpecies);
+		for (ResourceKey key : planet->mAnimalSpecies) {
+			PropertyListPtr propList;
+			PropManager.GetPropertyList(key.instanceID, key.groupID, propList); //TODO check why the last carnivore goes extint.
+		}
+	}
+}
+
+void cEmpireColonizationManager::FillPlanetEcosystem(cPlanetRecord* planet) {
+	if (!CompletePlanetPlantEcosystem(planet)) {
+		FillPlanetPlants(planet);
+	}
+	if (!CompletePlanetAnimalEcosystem(planet)) {
+		FillPlanetCreatures(planet);
+	}
+}
 
 void cEmpireColonizationManager::GeneratePlanets(cStarRecord* star) {
+	eastl::vector<cPlanetRecordPtr> planets = star->GetPlanetRecords();
 	cStar* starT = simulator_new<cStar>();
 	starT->mpStarRecord = star;
 	starT->GetSolarSystem();
 	GameNounManager.DestroyInstance(starT);
+	cPlanetRecordPtr planetToColonize = BestColonizablePlanet(star);
+	if (!CompletePlanetEcosystem(planetToColonize.get())) {
+		FillPlanetEcosystem(planetToColonize.get());
+	}
 }
 
 void cEmpireColonizationManager::ColonizeStarSystem(cEmpire* empire, cStarRecord* star) {
