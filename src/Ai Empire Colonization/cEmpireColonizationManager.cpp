@@ -66,17 +66,19 @@ void cEmpireColonizationManager::Initialize() {
 	App::Property::GetArrayKey(propList.get(), 0x5A2D3987, speedConfigs);
 
 	// Speed configuration.
-
+	bool found = false;
 	for (ResourceKey const &key : speedConfigs) {
-		bool found = PropManager.GetPropertyList(key.instanceID, key.groupID, propList);
+		found = PropManager.GetPropertyList(key.instanceID, key.groupID, propList);
 		if (found) { // Only one speedConfig was installed; we just have to find out which one it is.
-
-			App::Property::GetFloat(propList.get(), 0x79288FD9, cyclesToTargetColonies);
-
 			break;
 		}
 	}
-	// TODO print in console if no speedConfig was found.
+	if (found) {
+		App::Property::GetFloat(propList.get(), 0x79288FD9, cyclesToTargetColonies);
+	}
+	else {
+		App::ConsolePrintF("A broken installation of SensibleAiColonization was detected, please reinstall the mod.");
+	}
 
 	elapsedTime = 0;
 
