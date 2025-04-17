@@ -14,7 +14,7 @@ floats difficultyCyclesToApexColonies
 	80.0
 end
 float activeRadious 30.0
-int32 cycleInterval 30000
+int32 cycleInterval 1000#30000
 float apexNumSystems 13.0
 
 floats empireColonizationRange

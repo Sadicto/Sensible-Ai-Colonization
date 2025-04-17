@@ -120,11 +120,11 @@ public:
 	*/
 	SolarSystemOrbitTemperature GetPlanetOrbitTemperature(cPlanetRecord* planet);
 
-	bool CompletePlanetPlantEcosystem(cPlanetRecord* planet);
+	bool PlanetCompletePlantEcosystem(cPlanetRecord* planet);
 
-	bool CompletePlanetAnimalEcosystem(cPlanetRecord* planet);
+	bool PlanetCompleteAnimalEcosystem(cPlanetRecord* planet);
 
-	bool CompletePlanetEcosystem(cPlanetRecord* planet);
+	bool PlanetCompleteEcosystem(cPlanetRecord* planet);
 
 	/**
 	 * @brief Populates the planet's plant species based on the maximum capacity determined by the terrascore.
