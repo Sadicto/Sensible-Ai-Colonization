@@ -1,22 +1,6 @@
-floats difficultyAvgOneSystem
-	14.0
-	12.0
-	8.0
-end
-floats difficultyMaxAvg
-	60.0
-	40.0
-	30.0
-end
-floats difficultyCyclesToApexColonies
-	180.0
-	120.0
-	80.0
-end
 float activeRadious 30.0
-int32 cycleInterval 1000#30000
-float apexNumSystems 13.0
-
+int32 cycleInterval 30000
+float targetNumSystems 13.0
 floats empireColonizationRange
 	3.0
 	4.0
@@ -27,3 +11,13 @@ end
 
 int32 levelToColonizeTribe 1
 int32 levelToColonizeCiv 3
+
+keys speedConfigs
+	SaicConfig!ExtremelyFastSpeedConfig.prop
+	SaicConfig!VeryFastSpeedConfig.prop
+	SaicConfig!FastSpeedConfig.prop
+	SaicConfig!NormalSpeedConfig.prop
+	SaicConfig!SlowSpeedConfig.prop
+	SaicConfig!VerySlowSpeedConfig.prop
+	SaicConfig!ExtremelySlowSpeedConfig.prop
+end

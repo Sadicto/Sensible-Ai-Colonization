@@ -75,7 +75,7 @@ jobs:
               # Increment the index for each directory
               index=$((index + 1))
             done < <(find "$dir" -mindepth 1 -maxdepth 1 -type f -name "*.sln"  -printf "%f\n")
-          done < <(find "src/" -mindepth 1 -maxdepth 1 -type d)
+          done < <(find "src/" -mindepth 0 -maxdepth 1 -type d)
 
           solutions="matrix={ \"solution\": [ $solutions ] }"
           echo "$solutions"

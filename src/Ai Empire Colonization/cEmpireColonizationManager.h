@@ -211,7 +211,6 @@ public:
 
 	/**
 	 * @brief Calculates the probability of an empire colonizing a new system
-	 * based on its current number of stars.
 	 * Preconditions: none.
 	 * @param empire Pointer to the empire (cEmpire*) being evaluated.
 	 * @return Float between 0 and 1 representing the probability of colonization.
@@ -237,18 +236,12 @@ private:
 	// Miliseconds of gameTime between expansion cycles
 	int cycleInterval;
 
-	// Number of systems that maximize the probability of expansion in a cycle.
-	float apexNumSystems;
+	// Number of systems for which the probabilities are calculated from.
+	float targetNumSystems;
 
-	// Represents the average cycles necessary for an empire to colonize its first system.
-	float avgOneSystem;
-
-	// The maximum average cycles necessary to colonize the next system, regardless of the number of colonies.
-	float maxAvg;
-
-	// Average cycles necessary for an empire to reach apexNumSystems colonies.
-	float cyclesToApexColonies;
-
+	// Average cycles necessary for an empire to reach targetNumSystems colonies.
+	float cyclesToTargetColonies;
+	
 	// Colonization range per empire level, in parsecs.
 	eastl::vector<float> colonizationRange;
 
