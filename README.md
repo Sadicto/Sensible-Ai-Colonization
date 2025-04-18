@@ -21,6 +21,6 @@ This mod fixes that by making empires expand in a more cohesive and strategic wa
 |------------------|--------------|
 | ![Without the mod](images/VanillaExpansion.png) | ![With the mod](images/ModdedExpansion.png) |
 
-Both screenshots were taken after 1 hour and 30 minutes on normal difficulty.
+Both screenshots were taken after 1 hour and 30 minutes at fast speed.
 
 ---
