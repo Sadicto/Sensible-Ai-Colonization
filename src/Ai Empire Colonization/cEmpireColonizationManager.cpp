@@ -355,13 +355,16 @@ void cEmpireColonizationManager::GetEmpiresInRadius(const Vector3& coords, float
 	// Set prevents duplicates.
 	eastl::set<uint32_t> empireIDSet; 
 
-	uint32_t playerEmpireId = SpacePlayerData::Get()->mPlayerEmpireID;
 	uint32_t groxEmpireID = StarManager.GetGrobEmpireID();
 
-	// Collect unique mEmpireID owners of the stars, except the grox and player empire.
+	// Collect unique mEmpireID owners of the stars, except the grox, the player empire and other saves empires.
 	for (cStarRecordPtr star : starsColonized) {
-		if (star->mEmpireID != playerEmpireId && star->mEmpireID != groxEmpireID) {
-			empireIDSet.insert(star->mEmpireID);
+		cEmpire* starEmpire = StarManager.GetEmpire(star->mEmpireID);
+		if(starEmpire != nullptr && 
+			starEmpire != GetPlayerEmpire() && 
+			starEmpire->GetEmpireID() != groxEmpireID && 
+			(starEmpire->mFlags & (1 << 6)) == 0) /* no empire from other save.*/{
+			empireIDSet.insert(starEmpire->GetEmpireID());
 		}
 	}
 	// Get the empire for every id.
