@@ -11,7 +11,7 @@ This mod fixes that by making empires expand in a more cohesive and strategic wa
 - Empires favor systems with high-value spice types and/or habitable planets.
 - When colonizing a star system, the AI will always pick the best planet available.
 - Once an empire reaches a high enough strength factor, it will start conquering systems inhabited by tribes or civilizations.
-- The speed at which empires expand depends on the selected difficulty.
+- The speed at which empires expand can be customized when the mod is installed.
 - AI avoids colonizing special systems like Sol, systems with monoliths, save file stars, etc.
 - The Grox are not affected by this mod.
 
@@ -21,6 +21,6 @@ This mod fixes that by making empires expand in a more cohesive and strategic wa
 |------------------|--------------|
 | ![Without the mod](images/VanillaExpansion.png) | ![With the mod](images/ModdedExpansion.png) |
 
-Both screenshots were taken after 1 hour and 30 minutes on normal difficulty.
+Both screenshots were taken after 1 hour and 30 minutes at fast speed.
 
 ---
