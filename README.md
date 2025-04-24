@@ -13,7 +13,7 @@ This mod fixes that by making empires expand in a more cohesive and strategic wa
 - Once an empire reaches a high enough strength factor, it will start conquering systems inhabited by tribes or civilizations.
 - The speed at which empires expand can be customized when the mod is installed.
 - AI avoids colonizing special systems like Sol, systems with monoliths, save file stars, etc.
-- The Grox are not affected by this mod.
+- The Grox and empires from other saves are not affected by this mod.
 
 ## Comparison
 
