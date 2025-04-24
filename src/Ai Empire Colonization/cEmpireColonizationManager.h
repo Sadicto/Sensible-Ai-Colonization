@@ -162,7 +162,7 @@ public:
 
 	/**
 	 * @brief Retrieves all empires within a given radius of coordinates,
-	 * except for the Grox and the player empire.
+	 * except for the Grox, the player empire and empires from other save.
 	 * Preconditions: none.
 	 * @param coords Vector3 representing the center coordinates.
 	 * @param radius Float representing the search radius in parsecs.
