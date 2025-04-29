@@ -170,7 +170,7 @@ float cEmpireColonizationManager::PlanetColonizationScore(cPlanetRecord* planet)
             score = score + 10;
         }
     }
-	//moon.
+
     if (planet->IsMoon()) {
         score = score / 2;
     }
@@ -210,7 +210,7 @@ bool cEmpireColonizationManager::ColonizableStar(cStarRecord* star) {
 		(star->mFlags & (1 << 3)) == 0 && //no monolith
 		(star->mFlags & (1 << 1)) == 0 && //no savegame
 		star != StarManager.GetSol() &&
-		GetDistanceBetweenStars(GetActiveStarRecord(), star) < activeRadius) {
+		StarUtils::GetDistanceBetweenStars(GetActiveStarRecord(), star) < activeRadius) {
 
 		//at least one planet is colonizable.
 		for (cPlanetRecordPtr planet : star->GetPlanetRecords()) {
@@ -224,7 +224,7 @@ bool cEmpireColonizationManager::ColonizableStar(cStarRecord* star) {
 
 bool cEmpireColonizationManager::EmpireCanColonizeStar(cEmpire* empire, cStarRecord* star){
 	TechLevel techLevel = star->GetTechLevel();
-	int empireLevel = GetEmpireLevel(empire);
+	int empireLevel = EmpireUtils::GetEmpireLevel(empire);
 
 	return ColonizableStar(star) 
 		&& (techLevel == TechLevel::None || techLevel == TechLevel::Creature
@@ -270,20 +270,11 @@ float cEmpireColonizationManager::StarColonizationScore(cStarRecord* star) {
 	return score;
 }
 
-void cEmpireColonizationManager::GeneratePlanets(cStarRecord* star) {
-	eastl::vector<cPlanetRecordPtr> planets = star->GetPlanetRecords();
-	cStar* starT = simulator_new<cStar>();
-	starT->mpStarRecord = star;
-	starT->GetSolarSystem();
-	GameNounManager.DestroyInstance(starT);
-	cPlanetRecordPtr planetToColonize = BestColonizablePlanet(star);
-	if (!PlanetUtils::PlanetHasCompleteEcosystem(planetToColonize.get())) {
-		PlanetUtils::FillPlanetEcosystem(planetToColonize.get());
-	}
-}
-
 void cEmpireColonizationManager::ColonizeStarSystem(cEmpire* empire, cStarRecord* star) {
 	cPlanetRecordPtr planet = BestColonizablePlanet(star);
+	if (!PlanetUtils::PlanetHasCompleteEcosystem(planet.get())) {
+		PlanetUtils::FillPlanetEcosystem(planet.get());
+	}
 	uint32_t empireId = empire->GetEmpireID();
 
 	empire->AddStarOwnership(star);
@@ -297,88 +288,9 @@ void cEmpireColonizationManager::ColonizeStarSystem(cEmpire* empire, cStarRecord
 	}
 }
 
-void cEmpireColonizationManager::GetEmpiresInRadius(const Vector3& coords, float radius, eastl::vector<cEmpirePtr>& empires) {
-	StarRequestFilter filter;
-	filter.RemoveStarType(StarType::None);
-	filter.RemoveStarType(StarType::GalacticCore);
-	filter.RemoveStarType(StarType::ProtoPlanetary);
-	filter.RemoveStarType(StarType::BlackHole);
-	filter.techLevels = 0;
-	filter.AddTechLevel(TechLevel::Empire);
-	filter.minDistance = 0;
-	filter.maxDistance = radius;
-
-	eastl::vector<cStarRecordPtr> starsColonized;
-	StarManager.FindStars(coords, filter, starsColonized);
-
-	// Set prevents duplicates.
-	eastl::set<uint32_t> empireIDSet; 
-
-	uint32_t groxEmpireID = StarManager.GetGrobEmpireID();
-
-	// Collect unique mEmpireID owners of the stars, except the grox, the player empire and other saves empires.
-	for (cStarRecordPtr star : starsColonized) {
-		cEmpire* starEmpire = StarManager.GetEmpire(star->mEmpireID);
-		if(starEmpire != nullptr && 
-			starEmpire != GetPlayerEmpire() && 
-			starEmpire->GetEmpireID() != groxEmpireID && 
-			(starEmpire->mFlags & (1 << 6)) == 0) /* no empire from other save.*/{
-			empireIDSet.insert(starEmpire->GetEmpireID());
-		}
-	}
-	// Get the empire for every id.
-	for (uint32_t id : empireIDSet) {
-		empires.push_back(cEmpirePtr(StarManager.GetEmpire(id)));
-	}
-}
-
-void cEmpireColonizationManager::GetUnclaimedStarsInRadius(const Vector3& coords, float radius, eastl::vector<cStarRecordPtr>& stars) {
-	StarRequestFilter filter;
-	filter.RemoveStarType(StarType::None);
-	filter.RemoveStarType(StarType::GalacticCore);
-	filter.RemoveStarType(StarType::ProtoPlanetary);
-	filter.RemoveStarType(StarType::BlackHole);
-	filter.techLevels = 0;
-
-	//even stars with all planet in T0 have this techLevel
-	filter.AddTechLevel(TechLevel::Creature); 
-
-	//we don't care about tribes or civilizations
-	filter.AddTechLevel(TechLevel::Tribe);
-	filter.AddTechLevel(TechLevel::Civilization);
-
-	filter.minDistance = 0;
-	filter.maxDistance = radius;
-	cStarManager* starManager = cStarManager::Get();
-	starManager->FindStars(coords, filter, stars);
-}
-
-float cEmpireColonizationManager::GetDistanceBetweenStars(cStarRecord* star1, cStarRecord* star2) {
-	return (star1->mPosition - star2->mPosition).Length();
-}
-
-int cEmpireColonizationManager::GetEmpireLevel(cEmpire* empire) { // TODO read prop with the power levels and calculate it that way.
-	int numSystems = empire->mStars.size();
-	if (numSystems <= 3) {
-		return 0;
-	}
-	else if (numSystems <= 5) {
-		return 1;
-	}
-	else if (numSystems <= 8) {
-		return 2;
-	}
-	else if (numSystems <= 12) {
-		return 3;
-	}
-	else {
-		return 4;
-	}
-}
-
 void cEmpireColonizationManager::ExpandEmpire(cEmpire* empire) {
 	cStarRecord* homeworld = empire->GetHomeStarRecord();
-	float range = colonizationRange[GetEmpireLevel(empire)];
+	float range = colonizationRange[EmpireUtils::GetEmpireLevel(empire)];
 	eastl::vector<cStarRecordPtr> empireStars = empire->mStars;
 	cStarRecordPtr candidateStar = NULL;
 
@@ -389,7 +301,7 @@ void cEmpireColonizationManager::ExpandEmpire(cEmpire* empire) {
 	for (cStarRecordPtr empireStar : empireStars) {
 
 		eastl::vector<cStarRecordPtr> nearUnclaimedStars;
-		GetUnclaimedStarsInRadius(empireStar->mPosition, range, nearUnclaimedStars);
+		StarUtils::GetUnclaimedStarsInRadius(empireStar->mPosition, range, nearUnclaimedStars, true, true);
 		for (cStarRecordPtr nearbyStar : nearUnclaimedStars) {
 			// Planets are needed in each candidate star for the algorithm to function properly.
 			StarManager.RequirePlanetsForStar(nearbyStar.get());
@@ -399,7 +311,7 @@ void cEmpireColonizationManager::ExpandEmpire(cEmpire* empire) {
 				// If the star is not in the map, add it and calculate its base score.
 				if (starScores.count(nearbyStar) == 0) {
 					// The further the star is from the homeworld, the lower the score.
-					starScores[nearbyStar] = StarColonizationScore(nearbyStar.get()) / (GetDistanceBetweenStars(homeworld, nearbyStar.get()) * 2);
+					starScores[nearbyStar] = StarColonizationScore(nearbyStar.get()) / (StarUtils::GetDistanceBetweenStars(homeworld, nearbyStar.get()) * 2);
 				}
 				else {
 					// If the star is already in the map, it means it's close to multiple stars, so increase its score.
@@ -424,7 +336,7 @@ void cEmpireColonizationManager::ExpandEmpire(cEmpire* empire) {
 		else if (candidateStar->GetTechLevel() == TechLevel::Civilization) {
 			PlanetUtils::DeleteCivFromStar(candidateStar.get());
 		}
-		GeneratePlanets(candidateStar.get());
+		StarUtils::GeneratePlanets(candidateStar.get());
 		ColonizeStarSystem(empire, candidateStar.get());
 	}
 }
@@ -437,7 +349,7 @@ void cEmpireColonizationManager::EmpiresExpansionCycle() {
 	// Only empires within activeRadius parsecs can expand.
 	eastl::vector <cEmpirePtr> nearEmpires;
 
-	GetEmpiresInRadius(GetActiveStarRecord()->mPosition, activeRadius, nearEmpires);
+	EmpireUtils::GetEmpiresInRadius(GetActiveStarRecord()->mPosition, activeRadius, nearEmpires);
 	// For each nearby empire, calculate pOfExpansion and expand it based on the probability.
 	for (cEmpirePtr empire : nearEmpires) {
 		float pOfExpansion = EmpireColonizationProbability(empire.get());

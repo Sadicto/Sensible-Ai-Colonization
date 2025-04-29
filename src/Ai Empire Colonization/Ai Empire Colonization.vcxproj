@@ -102,8 +102,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cEmpireColonizationManager.h" />
+    <ClInclude Include="Spore-Mod-Utils\EmpireUtils\EmpireUtils.h" />
     <ClInclude Include="Spore-Mod-Utils\PlanetUtils\PlanetUtils.h" />
     <ClInclude Include="Spore-Mod-Utils\Include\SporeModUtils.h" />
+    <ClInclude Include="Spore-Mod-Utils\StarUtils\StarUtils.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
@@ -117,10 +119,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Spore-Mod-Utils\EmpireUtils\EmpireUtils.cpp" />
     <ClCompile Include="Spore-Mod-Utils\PlanetUtils\PlanetUtils.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="Spore-Mod-Utils\StarUtils\StarUtils.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

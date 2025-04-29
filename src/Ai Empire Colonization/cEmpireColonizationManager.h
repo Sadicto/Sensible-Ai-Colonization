@@ -102,57 +102,12 @@ public:
 	float StarColonizationScore(cStarRecord* star);
 
 	/**
-	*  @brief Assign spices to all planets in the stars and generates its orbits.
-	* Preconditions: none.
-	* @param star The star system in which the planets will be generated
-	*/
-	void GeneratePlanets(cStarRecord* star);
-
-	/**
-	 * @brief Colonizes a star system with the given empire.
+	 * @brief Colonizes a star system with the given empire. The colonized planet will have its ecosystem filled.
 	 * Preconditions: ColonizableStar(star) and no tribes or civilizations present.
 	 * @param empire Pointer to the empire (cEmpire*) performing the colonization.
 	 * @param star Pointer to the star system (cStarRecord*) being colonized.
 	 */
 	void ColonizeStarSystem(cEmpire* empire, cStarRecord* star);
-
-	/**
-	 * @brief Retrieves all empires within a given radius of coordinates,
-	 * except for the Grox, the player empire and empires from other save.
-	 * Preconditions: none.
-	 * @param coords Vector3 representing the center coordinates.
-	 * @param radius Float representing the search radius in parsecs.
-	 * @param empires Vector to store the list of empires (eastl::vector<cEmpirePtr>&)
-	 * found within the radius.
-	 */
-	void GetEmpiresInRadius(const Vector3& coords, float radius, eastl::vector<cEmpirePtr>& empires);
-
-
-	/**
-	 * @brief Retrieves all unclaimed stars (by an empire) within a given radius of coordinates.
-	 * Preconditions: none.
-	 * @param coords Vector3 representing the center coordinates.
-	 * @param radius Float representing the search radius in parsecs.
-	 * @param stars Vector to store the list of unclaimed stars (eastl::vector<cStarRecordPtr>&) found within the radius.
-	 */
-	void GetUnclaimedStarsInRadius(const Vector3& coords, float radius, eastl::vector<cStarRecordPtr>& stars);
-
-	/**
-	 * @brief Calculates the distance between two star systems.
-	 * Preconditions: none.
-	 * @param star1 Pointer to the first star system (cStarRecord*).
-	 * @param star2 Pointer to the second star system (cStarRecord*).
-	 * @return Float representing the distance between the two stars in parsecs.
-	 */
-	float GetDistanceBetweenStars(cStarRecord* star1, cStarRecord* star2);
-
-	/**
-	* @brief returns the power level of an empire
-	* defined by its number of stars.
-	* Preconditions: none.
-	* @param empire pointer to the empire
-	*/
-	int GetEmpireLevel(cEmpire* empire);
 
 	/**
 	* @brief Expands the empire to a new star system,
