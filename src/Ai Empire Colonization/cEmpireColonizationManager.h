@@ -2,10 +2,12 @@
 
 #include <Spore\BasicIncludes.h>
 #include <Spore/Simulator/Serialization.h>
+#include "Spore-Mod-Utils/Include/SporeModUtils.h"
 
 #define cEmpireColonizationManagerPtr intrusive_ptr<cEmpireColonizationManager>
 
 using namespace Simulator;
+using namespace SporeModUtils;
 
 class cEmpireColonizationManager
 	: public Simulator::cStrategy
@@ -99,52 +101,6 @@ public:
 	 */
 	float StarColonizationScore(cStarRecord* star);
 
-	/**
-	 * @brief Deletes a tribal species from a star system.
-	 * Preconditions: none.
-	 * @param star Pointer to the star system (cStarRecord*) containing the tribal civilization.
-	 */
-	void DeleteTribeFromStar(cStarRecord* star);
-
-	/**
-	 * @brief Deletes a civilization from a star system.
-	 * Preconditions: none.
-	 * @param star Pointer to the star system (cStarRecord*) containing the civilization.
-	 */
-	void DeleteCivFromStar(cStarRecord* star);
-
-	/**
-	* @brief Returns the orbit's type of a planet (hot, cold or normal).
-	* Preconditions: none.
-	* @param planet Pointer to the planet.
-	*/
-	SolarSystemOrbitTemperature GetPlanetOrbitTemperature(cPlanetRecord* planet);
-
-	bool PlanetCompletePlantEcosystem(cPlanetRecord* planet);
-
-	bool PlanetCompleteAnimalEcosystem(cPlanetRecord* planet);
-
-	bool PlanetCompleteEcosystem(cPlanetRecord* planet);
-
-	/**
-	 * @brief Populates the planet's plant species based on the maximum capacity determined by the terrascore.
-	 * @param planet Pointer to the planet record whose plants will be populated.
-	 */
-	void FillPlanetPlants(cPlanetRecord* planet);
-
-	/**
-	 * @brief Populates the planet's creature species based on the maximum capacity determined by the terrascore.
-	 * @param planet Pointer to the planet record whose creatures will be populated.
-	 */
-	void FillPlanetCreatures(cPlanetRecord* planet);
-
-	/**
-	 * @brief Populates the planet's ecosystem with both plant and creature species based on the maximum capacity determined by the terrascore.
-	 * @param planet Pointer to the planet record whose ecosystem will be populated.
-	 */
-	void FillPlanetEcosystem(cPlanetRecord* planet);
-
-	
 	/**
 	*  @brief Assign spices to all planets in the stars and generates its orbits.
 	* Preconditions: none.

@@ -1,0 +1,3 @@
+[submodule "src/Ai Empire Colonization/Spore-Mod-Utils"]
+	path = src/Ai Empire Colonization/Spore-Mod-Utils
+	url = https://github.com/Sadicto/Spore-Mod-Utils
