@@ -102,7 +102,6 @@ void cEmpireColonizationManager::Initialize() {
 	eastl::string16 stringPurple(u"spice6");
 	ResourceKey::Parse(purpleSpice, stringPurple.c_str());
 	
-	ResourceKey::Parse(adventureIconKey, u"0x0199b485!0x881aeb0a.0x2f7d0004");
 }
 
 void cEmpireColonizationManager::Dispose() {
@@ -143,16 +142,6 @@ void cEmpireColonizationManager::OnModeEntered(uint32_t previousModeID, uint32_t
 
 cEmpireColonizationManagerPtr cEmpireColonizationManager::Get() {
 	return instance;
-}
-
-bool cEmpireColonizationManager::ColonizablePlanet(cPlanetRecord* planet) { //TODO 201planet.
-	PlanetType type = planet->mType;
-	return ((type == PlanetType::T3 ||
-		type == PlanetType::T2 ||
-		type == PlanetType::T1 ||
-		type == PlanetType::T0) &&
-		(cPlanetRecord::GetTypeIconKey(planet) != adventureIconKey && //not adventure, idk if there's a better way to do this
-		!planet->IsDestroyed()));
 }
 
 float cEmpireColonizationManager::PlanetColonizationScore(cPlanetRecord* planet) {
@@ -214,7 +203,7 @@ bool cEmpireColonizationManager::ColonizableStar(cStarRecord* star) {
 
 		//at least one planet is colonizable.
 		for (cPlanetRecordPtr planet : star->GetPlanetRecords()) {
-			if (ColonizablePlanet(planet.get())){
+			if (PlanetUtils::InteractablePlanet(planet.get())){
 				return (true);
 			}
 		}
@@ -238,7 +227,7 @@ cPlanetRecordPtr cEmpireColonizationManager::BestColonizablePlanet(cStarRecord* 
 	eastl::vector<cPlanetRecordPtr> colonizablePlanets;
 
 	for (cPlanetRecordPtr planet : star->GetPlanetRecords()) {
-		if (ColonizablePlanet(planet.get())) {
+		if (PlanetUtils::InteractablePlanet(planet.get())) {
 			colonizablePlanets.push_back(planet); 
 		}
 	}
@@ -258,6 +247,18 @@ cPlanetRecordPtr cEmpireColonizationManager::BestColonizablePlanet(cStarRecord* 
 	return bestPlanet;
 }
 
+void cEmpireColonizationManager::ColonizePlanet(cEmpire* empire, cPlanetRecord* planet) {
+	if (!PlanetUtils::PlanetHasCompleteEcosystem(planet)) {
+		PlanetUtils::FillPlanetEcosystem(planet);
+	}
+	planet->mTechLevel = TechLevel::Empire;
+	cPlanetRecord::FillPlanetDataForTechLevel(planet, TechLevel::Empire);
+	for (auto civData : planet->mCivData) {
+		civData->mPoliticalID = empire->GetEmpireID();
+	}
+
+}
+
 float cEmpireColonizationManager::StarColonizationScore(cStarRecord* star) {
 	float score = PlanetColonizationScore(BestColonizablePlanet(star).get());
 
@@ -271,20 +272,16 @@ float cEmpireColonizationManager::StarColonizationScore(cStarRecord* star) {
 }
 
 void cEmpireColonizationManager::ColonizeStarSystem(cEmpire* empire, cStarRecord* star) {
-	cPlanetRecordPtr planet = BestColonizablePlanet(star);
-	if (!PlanetUtils::PlanetHasCompleteEcosystem(planet.get())) {
-		PlanetUtils::FillPlanetEcosystem(planet.get());
-	}
-	uint32_t empireId = empire->GetEmpireID();
-
+	
 	empire->AddStarOwnership(star);
 	star->mTechLevel = TechLevel::Empire;
-	star->mEmpireID = empireId;
-
-	planet->mTechLevel = TechLevel::Empire;
-	cPlanetRecord::FillPlanetDataForTechLevel(planet.get(), TechLevel::Empire);
-	for (auto civData : planet->mCivData) {
-		civData->mPoliticalID = empireId;
+	star->mEmpireID = empire->GetEmpireID();;
+	//cPlanetRecordPtr planet = BestColonizablePlanet(star);
+	//ColonizePlanet(empire, planet.get());
+	for (cPlanetRecordPtr planet : star->GetPlanetRecords()) {
+		if (PlanetUtils::InteractablePlanet(planet.get())) {
+			ColonizePlanet(empire, planet.get());
+		}
 	}
 }
 
@@ -331,10 +328,10 @@ void cEmpireColonizationManager::ExpandEmpire(cEmpire* empire) {
 	// If candidateStar is NULL, then there isn't a nearby colonizable star, so the empire does not expand.
 	if (candidateStar != NULL) {
 		if (candidateStar->GetTechLevel() == TechLevel::Tribe) {
-			PlanetUtils::DeleteTribeFromStar(candidateStar.get());
+			StarUtils::DeleteTribeFromStar(candidateStar.get());
 		}
 		else if (candidateStar->GetTechLevel() == TechLevel::Civilization) {
-			PlanetUtils::DeleteCivFromStar(candidateStar.get());
+			StarUtils::DeleteCivFromStar(candidateStar.get());
 		}
 		StarUtils::GeneratePlanets(candidateStar.get());
 		ColonizeStarSystem(empire, candidateStar.get());

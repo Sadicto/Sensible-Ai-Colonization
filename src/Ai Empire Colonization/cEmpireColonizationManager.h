@@ -45,15 +45,6 @@ public:
 	static cEmpireColonizationManagerPtr Get();
 
 	/**
-	 * @brief Determines if a given planet is colonizable, meaning it is a terrestrial planet,
-	 * is not destroyed, and is not an adventure. (TODO check for 201 ruins planet)
-	 * Preconditions: none.
-	 * @param planet Pointer to the planet (cPlanetRecord*) to check for colonization.
-	 * @return true if the planet is colonizable, false otherwise.
-	 */
-	bool ColonizablePlanet(cPlanetRecord* planet);
-
-	/**
 	 * @brief Calculates the colonization score of a planet,
 	 * with higher scores for a higher terrascore,
 	 * expensive spice, and T0 with green orbits,
@@ -90,6 +81,14 @@ public:
 	 * @return Pointer to the best colonizable planet (cPlanetRecordPtr).
 	 */
 	cPlanetRecordPtr BestColonizablePlanet(cStarRecord* star);
+
+	/**
+	 * @brief Colonizes the planet with the given empire. The colonized planet will have its ecosystem filled.
+	 * Preconditions: No tribes or civilization planets.
+	 * @param empire
+	 * @param planet
+	 */
+	void ColonizePlanet(cEmpire* empire, cPlanetRecord* planet);
 
 	/**
 	 * @brief Calculates the colonization score of a star system
@@ -169,7 +168,6 @@ private:
 	ResourceKey pinkSpice;
 	ResourceKey purpleSpice;
 
-	ResourceKey adventureIconKey;
 
 	int elapsedTime;
 };
