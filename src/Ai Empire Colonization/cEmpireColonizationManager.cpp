@@ -276,13 +276,8 @@ void cEmpireColonizationManager::ColonizeStarSystem(cEmpire* empire, cStarRecord
 	empire->AddStarOwnership(star);
 	star->mTechLevel = TechLevel::Empire;
 	star->mEmpireID = empire->GetEmpireID();;
-	//cPlanetRecordPtr planet = BestColonizablePlanet(star);
-	//ColonizePlanet(empire, planet.get());
-	for (cPlanetRecordPtr planet : star->GetPlanetRecords()) {
-		if (PlanetUtils::InteractablePlanet(planet.get())) {
-			ColonizePlanet(empire, planet.get());
-		}
-	}
+	cPlanetRecordPtr planet = BestColonizablePlanet(star);
+	ColonizePlanet(empire, planet.get());
 }
 
 void cEmpireColonizationManager::ExpandEmpire(cEmpire* empire) {
