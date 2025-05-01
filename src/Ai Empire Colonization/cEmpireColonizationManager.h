@@ -13,6 +13,13 @@ class cEmpireColonizationManager
 	: public Simulator::cStrategy
 {
 public:
+
+	enum class PlanetColonizationConfig : uint32_t {
+		Disabled = 0,
+		OnlyHabitable = 1,
+		AllPlanets = 2
+	};
+
 	static const uint32_t TYPE = id("AiEmpireColonization::cEmpireColonizationManager");
 	static const uint32_t NOUN_ID = TYPE;
 
@@ -109,6 +116,13 @@ public:
 	void ColonizeStarSystem(cEmpire* empire, cStarRecord* star);
 
 	/**
+	 * @brief Colonizes the best available planet in the empire's owned systems.
+	 * If no planets are available, no colonization occurs.
+	 * @param empire.
+	 */
+	void ColonizePlanetInOwnedSystem(cEmpire* empire);
+
+	/**
 	* @brief Expands the empire to a new star system,
 	* prioritizing those closer to the homeworld, other colonies,
 	* and a higher StarColonizationScore(Star).
@@ -160,6 +174,9 @@ private:
 
 	// Minimun level for an empire to be able to colonize a star with a civ.
 	int levelToColonizeCiv;
+
+	// When colonizing planets in an already owned system, which planets can the empire colonize.
+	PlanetColonizationConfig planetColonizationConfig;
 
 	ResourceKey redSpice;
 	ResourceKey yellowSpice;

@@ -81,6 +81,10 @@ void cEmpireColonizationManager::Initialize() {
 		App::ConsolePrintF("A broken installation of SensibleAiColonization was detected, please reinstall the mod.");
 	}
 
+	// Planet colonization configuration.
+
+	planetColonizationConfig = PlanetColonizationConfig::AllPlanets;
+
 	elapsedTime = 0;
 
 	//idk if there´s a better way to do this lol.
@@ -280,6 +284,35 @@ void cEmpireColonizationManager::ColonizeStarSystem(cEmpire* empire, cStarRecord
 	ColonizePlanet(empire, planet.get());
 }
 
+void cEmpireColonizationManager::ColonizePlanetInOwnedSystem(cEmpire* empire) {
+	bool excludeT0;
+	switch (planetColonizationConfig) {
+	case(PlanetColonizationConfig::OnlyHabitable): {
+		excludeT0 = true;
+		break;
+	}
+	case(PlanetColonizationConfig::AllPlanets): {
+		excludeT0 = false;
+		break;
+	}
+	// this should never happen.
+	default: {
+		excludeT0 = true;
+		break;
+	}
+	}
+	eastl::vector<cPlanetRecordPtr> planets;
+	EmpireUtils::GetEmpirePlanets(empire, planets, true, false, false, false, excludeT0);
+	// Find the planet with the best colonization score.
+	auto it = eastl::max_element(planets.begin(), planets.end(),
+		[this](const cPlanetRecordPtr& a, const cPlanetRecordPtr& b) {
+			return PlanetColonizationScore(a.get()) < PlanetColonizationScore(b.get());
+		});
+	if (it != planets.end()) {
+		ColonizePlanet(empire, it->get());
+	}
+}
+
 void cEmpireColonizationManager::ExpandEmpire(cEmpire* empire) {
 	cStarRecord* homeworld = empire->GetHomeStarRecord();
 	float range = colonizationRange[EmpireUtils::GetEmpireLevel(empire)];
@@ -320,7 +353,7 @@ void cEmpireColonizationManager::ExpandEmpire(cEmpire* empire) {
 			}
 		}
 	}
-	// If candidateStar is NULL, then there isn't a nearby colonizable star, so the empire does not expand.
+	// If candidateStar is NULL, then there isn't a nearby colonizable star.
 	if (candidateStar != NULL) {
 		if (candidateStar->GetTechLevel() == TechLevel::Tribe) {
 			StarUtils::DeleteTribeFromStar(candidateStar.get());
@@ -330,6 +363,9 @@ void cEmpireColonizationManager::ExpandEmpire(cEmpire* empire) {
 		}
 		StarUtils::GeneratePlanets(candidateStar.get());
 		ColonizeStarSystem(empire, candidateStar.get());
+	}
+	else if (planetColonizationConfig != PlanetColonizationConfig::Disabled) {
+		ColonizePlanetInOwnedSystem(empire);
 	}
 }
 
