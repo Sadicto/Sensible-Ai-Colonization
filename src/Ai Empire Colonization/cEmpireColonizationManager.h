@@ -175,8 +175,11 @@ private:
 	// Minimun level for an empire to be able to colonize a star with a civ.
 	int levelToColonizeCiv;
 
-	// When colonizing planets in an already owned system, which planets can the empire colonize.
-	PlanetColonizationConfig planetColonizationConfig;
+	// Allows AI empires to colonize additional planets within systems they already control.
+	bool enableIntraSystemColonization;
+
+	// When colonizing within owned systems, determines whether T0 planets should be excluded.
+	bool excludeT0PlanetColonization;
 
 	ResourceKey redSpice;
 	ResourceKey yellowSpice;

@@ -1,0 +1,2 @@
+bool enableIntraSystemColonization false
+bool excludeT0PlanetColonization true

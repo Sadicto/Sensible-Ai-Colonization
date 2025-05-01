@@ -46,44 +46,59 @@ void cEmpireColonizationManager::Initialize() {
 
 	eastl::vector<ResourceKey> speedConfigs;
 
-	PropertyListPtr propList;
+	eastl::vector<ResourceKey> intraSystemPlanetColonizationConfigs;
 
-	PropManager.GetPropertyList(id("Config"), id("SaicConfig"), propList);
+	PropertyListPtr generalConfiguration;
+
+	PropManager.GetPropertyList(id("Config"), id("SaicConfig"), generalConfiguration);
 	
 	// General configuration.
 
-	App::Property::GetFloat(propList.get(), 0x676FDB24, activeRadius);
+	App::Property::GetFloat(generalConfiguration.get(), 0x676FDB24, activeRadius);
 
-	App::Property::GetInt32(propList.get(), 0x964CF55A, cycleInterval);
+	App::Property::GetInt32(generalConfiguration.get(), 0x964CF55A, cycleInterval);
 
-	App::Property::GetFloat(propList.get(), 0x98199E80, targetNumSystems);
+	App::Property::GetFloat(generalConfiguration.get(), 0x98199E80, targetNumSystems);
 
-	App::Property::GetInt32(propList.get(), 0xD226209D, levelToColonizeTribe);
+	App::Property::GetInt32(generalConfiguration.get(), 0xD226209D, levelToColonizeTribe);
 
-	App::Property::GetInt32(propList.get(), 0xBEE4774B, levelToColonizeCiv);
+	App::Property::GetInt32(generalConfiguration.get(), 0xBEE4774B, levelToColonizeCiv);
 
-	App::Property::GetArrayFloat(propList.get(), 0xDFC93C59, colonizationRange);
+	App::Property::GetArrayFloat(generalConfiguration.get(), 0xDFC93C59, colonizationRange);
 
-	App::Property::GetArrayKey(propList.get(), 0x5A2D3987, speedConfigs);
+	App::Property::GetArrayKey(generalConfiguration.get(), 0x5A2D3987, speedConfigs);
+
+	App::Property::GetArrayKey(generalConfiguration.get(), 0xEA4FE14A, intraSystemPlanetColonizationConfigs);
 
 	// Speed configuration.
 	bool found = false;
 	for (ResourceKey const &key : speedConfigs) {
-		found = PropManager.GetPropertyList(key.instanceID, key.groupID, propList);
+		PropertyListPtr speedConfiguration;
+		found = PropManager.GetPropertyList(key.instanceID, key.groupID, speedConfiguration);
 		if (found) { // Only one speedConfig was installed; we just have to find out which one it is.
+			App::Property::GetFloat(speedConfiguration.get(), 0x79288FD9, cyclesToTargetColonies);
 			break;
 		}
 	}
-	if (found) {
-		App::Property::GetFloat(propList.get(), 0x79288FD9, cyclesToTargetColonies);
-	}
-	else {
+	if (!found) {
 		App::ConsolePrintF("A broken installation of SensibleAiColonization was detected, please reinstall the mod.");
 	}
 
-	// Planet colonization configuration.
+	// Intra system planet colonization configuration.
 
-	planetColonizationConfig = PlanetColonizationConfig::AllPlanets;
+	found = false;
+	for (ResourceKey const& key : intraSystemPlanetColonizationConfigs) {
+		PropertyListPtr intraSystemConfiguration;
+		found = PropManager.GetPropertyList(key.instanceID, key.groupID, intraSystemConfiguration);
+		if (found) { // Only one intraSystemConfig was installed; we just have to find out which one it is.
+			App::Property::GetBool(intraSystemConfiguration.get(), 0x1FEB9478, enableIntraSystemColonization);
+			App::Property::GetBool(intraSystemConfiguration.get(), 0x21BD71B0, excludeT0PlanetColonization);
+			break;
+		}
+	}
+	if (!found) {
+		App::ConsolePrintF("A broken installation of SensibleAiColonization was detected, please reinstall the mod.");
+	}
 
 	elapsedTime = 0;
 
@@ -285,24 +300,8 @@ void cEmpireColonizationManager::ColonizeStarSystem(cEmpire* empire, cStarRecord
 }
 
 void cEmpireColonizationManager::ColonizePlanetInOwnedSystem(cEmpire* empire) {
-	bool excludeT0;
-	switch (planetColonizationConfig) {
-	case(PlanetColonizationConfig::OnlyHabitable): {
-		excludeT0 = true;
-		break;
-	}
-	case(PlanetColonizationConfig::AllPlanets): {
-		excludeT0 = false;
-		break;
-	}
-	// this should never happen.
-	default: {
-		excludeT0 = true;
-		break;
-	}
-	}
 	eastl::vector<cPlanetRecordPtr> planets;
-	EmpireUtils::GetEmpirePlanets(empire, planets, true, false, false, false, excludeT0);
+	EmpireUtils::GetEmpirePlanets(empire, planets, true, false, false, false, excludeT0PlanetColonization);
 	// Find the planet with the best colonization score.
 	auto it = eastl::max_element(planets.begin(), planets.end(),
 		[this](const cPlanetRecordPtr& a, const cPlanetRecordPtr& b) {
@@ -364,7 +363,7 @@ void cEmpireColonizationManager::ExpandEmpire(cEmpire* empire) {
 		StarUtils::GeneratePlanets(candidateStar.get());
 		ColonizeStarSystem(empire, candidateStar.get());
 	}
-	else if (planetColonizationConfig != PlanetColonizationConfig::Disabled) {
+	else if (enableIntraSystemColonization) {
 		ColonizePlanetInOwnedSystem(empire);
 	}
 }

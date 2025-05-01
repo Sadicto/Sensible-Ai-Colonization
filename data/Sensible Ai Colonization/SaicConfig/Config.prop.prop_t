@@ -21,3 +21,9 @@ keys speedConfigs
 	SaicConfig!VerySlowSpeedConfig.prop
 	SaicConfig!ExtremelySlowSpeedConfig.prop
 end
+
+keys intraSystemPlanetColonizationConfigs
+	SaicConfig!DisabledIntraSystemColonization.prop
+	SaicConfig!OnlyHabitablePlanetsIntraSystemColonization.prop
+	SaicConfig!AllPlanetsIntraSystemColonization.prop
+end
