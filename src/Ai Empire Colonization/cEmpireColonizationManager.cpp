@@ -44,9 +44,9 @@ cEmpireColonizationManagerPtr cEmpireColonizationManager::instance = nullptr;
 void cEmpireColonizationManager::Initialize() {
 	instance = cEmpireColonizationManagerPtr(this);
 
-	eastl::vector<ResourceKey> speedConfigs;
+	ResourceKey speedConfigKey;
 
-	eastl::vector<ResourceKey> intraSystemPlanetColonizationConfigs;
+	ResourceKey intraSystemColonizationKey;
 
 	PropertyListPtr generalConfiguration;
 
@@ -66,37 +66,28 @@ void cEmpireColonizationManager::Initialize() {
 
 	App::Property::GetArrayFloat(generalConfiguration.get(), 0xDFC93C59, colonizationRange);
 
-	App::Property::GetArrayKey(generalConfiguration.get(), 0x5A2D3987, speedConfigs);
+	App::Property::GetKey(generalConfiguration.get(), 0x7176E6BC, speedConfigKey);
 
-	App::Property::GetArrayKey(generalConfiguration.get(), 0xEA4FE14A, intraSystemPlanetColonizationConfigs);
+	App::Property::GetKey(generalConfiguration.get(), 0x21EC8183, intraSystemColonizationKey);
 
 	// Speed configuration.
-	bool found = false;
-	for (ResourceKey const &key : speedConfigs) {
-		PropertyListPtr speedConfiguration;
-		found = PropManager.GetPropertyList(key.instanceID, key.groupID, speedConfiguration);
-		if (found) { // Only one speedConfig was installed; we just have to find out which one it is.
-			App::Property::GetFloat(speedConfiguration.get(), 0x79288FD9, cyclesToTargetColonies);
-			break;
-		}
+	PropertyListPtr speedConfiguration;
+	bool found = PropManager.GetPropertyList(speedConfigKey.instanceID, speedConfigKey.groupID, speedConfiguration);
+	if (found) {
+		App::Property::GetFloat(speedConfiguration.get(), 0x79288FD9, cyclesToTargetColonies);
 	}
-	if (!found) {
+	else {
 		App::ConsolePrintF("A broken installation of SensibleAiColonization was detected, please reinstall the mod.");
 	}
 
 	// Intra system planet colonization configuration.
-
-	found = false;
-	for (ResourceKey const& key : intraSystemPlanetColonizationConfigs) {
-		PropertyListPtr intraSystemConfiguration;
-		found = PropManager.GetPropertyList(key.instanceID, key.groupID, intraSystemConfiguration);
-		if (found) { // Only one intraSystemConfig was installed; we just have to find out which one it is.
-			App::Property::GetBool(intraSystemConfiguration.get(), 0x1FEB9478, enableIntraSystemColonization);
-			App::Property::GetBool(intraSystemConfiguration.get(), 0x21BD71B0, excludeT0PlanetColonization);
-			break;
-		}
+	PropertyListPtr intraSystemConfiguration;
+	found = PropManager.GetPropertyList(intraSystemColonizationKey.instanceID, intraSystemColonizationKey.groupID, intraSystemConfiguration);
+	if (found) {
+		App::Property::GetBool(intraSystemConfiguration.get(), 0x1FEB9478, enableIntraSystemColonization);
+		App::Property::GetBool(intraSystemConfiguration.get(), 0x21BD71B0, excludeT0PlanetColonization);
 	}
-	if (!found) {
+	else {
 		App::ConsolePrintF("A broken installation of SensibleAiColonization was detected, please reinstall the mod.");
 	}
 
@@ -307,7 +298,7 @@ void cEmpireColonizationManager::ColonizePlanetInOwnedSystem(cEmpire* empire) {
 		[this](const cPlanetRecordPtr& a, const cPlanetRecordPtr& b) {
 			return PlanetColonizationScore(a.get()) < PlanetColonizationScore(b.get());
 		});
-	if (it != planets.end()) {
+	if (it != planets.end() && it->get() != GetActivePlanetRecord()) {
 		ColonizePlanet(empire, it->get());
 	}
 }

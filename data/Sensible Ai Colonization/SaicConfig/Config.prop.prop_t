@@ -3,8 +3,8 @@ int32 cycleInterval 30000
 float targetNumSystems 13.0
 floats empireColonizationRange
 	3.0
-	4.0
 	5.0
+	5.5
 	6.0
 	7.0
 end
@@ -12,18 +12,6 @@ end
 int32 levelToColonizeTribe 1
 int32 levelToColonizeCiv 3
 
-keys speedConfigs
-	SaicConfig!ExtremelyFastSpeedConfig.prop
-	SaicConfig!VeryFastSpeedConfig.prop
-	SaicConfig!FastSpeedConfig.prop
-	SaicConfig!NormalSpeedConfig.prop
-	SaicConfig!SlowSpeedConfig.prop
-	SaicConfig!VerySlowSpeedConfig.prop
-	SaicConfig!ExtremelySlowSpeedConfig.prop
-end
+key speedConfig SaicConfig!SpeedConfig.prop
 
-keys intraSystemPlanetColonizationConfigs
-	SaicConfig!DisabledIntraSystemColonization.prop
-	SaicConfig!OnlyHabitablePlanetsIntraSystemColonization.prop
-	SaicConfig!AllPlanetsIntraSystemColonization.prop
-end
+key intraSystemPlanetColonizationConfig SaicConfig!IntraSystemColonizationConfig.prop
