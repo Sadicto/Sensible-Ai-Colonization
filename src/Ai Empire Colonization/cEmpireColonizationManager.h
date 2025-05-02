@@ -181,6 +181,14 @@ private:
 	// When colonizing within owned systems, determines whether T0 planets should be excluded.
 	bool excludeT0PlanetColonization;
 
+	eastl::vector<cEmpirePtr> empires;
+
+	int empiresPerSubCycle;
+
+	int lastCycleTime;
+	int cycleStep;
+	int systemsColonized;
+	eastl::vector<cEmpirePtr>::iterator empireToExpand;
 	ResourceKey redSpice;
 	ResourceKey yellowSpice;
 	ResourceKey blueSpice;
