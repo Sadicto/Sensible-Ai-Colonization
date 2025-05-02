@@ -223,27 +223,9 @@ float cEmpireColonizationManager::PlanetColonizationScore(cPlanetRecord* planet)
 }
 
 bool cEmpireColonizationManager::ColonizableStar(cStarRecord* star) { 
-
-	StarType type = star->GetType();
-	//a star, unclaimed, no monolith, not savegme, not Sol and near the player.
-	if (
-		type != StarType::GalacticCore &&
-		type != StarType::BlackHole &&
-		type != StarType::ProtoPlanetary &&
-		star->GetTechLevel() != TechLevel::Empire &&
-		(star->mFlags & (1 << 3)) == 0 && //no monolith
-		(star->mFlags & (1 << 1)) == 0 && //no savegame
-		star != StarManager.GetSol() /* &&
-		StarUtils::GetDistanceBetweenStars(GetActiveStarRecord(), star) < activeRadius*/) {
-
-		//at least one planet is colonizable.
-		for (cPlanetRecordPtr planet : star->GetPlanetRecords()) {
-			if (PlanetUtils::InteractablePlanet(planet.get())){
-				return (true);
-			}
-		}
-	}
-	return false;
+	return StarUtils::ValidStar(star) && 
+		star->GetTechLevel() != TechLevel::Empire && 
+		StarUtils::GetDistanceBetweenStars(GetActiveStarRecord(), star) < activeRadius;
 }
 
 bool cEmpireColonizationManager::EmpireCanColonizeStar(cEmpire* empire, cStarRecord* star){

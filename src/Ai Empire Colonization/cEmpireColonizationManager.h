@@ -63,12 +63,10 @@ public:
 	float PlanetColonizationScore(cPlanetRecord* planet);
 
 	/**
-	* @brief Determines if a given star system is colonizable, meaning it is a star,
-	* has no owning empire (tribes and civilizations do not count), has no monolith
-	* is not a save, not sol, contains at least one colonizable planet and
+	* @brief Determines if a given star system is colonizable, meaning it is a valid star,
+	* has no owning empire (tribes and civilizations do not count) an
 	* is at most activeRadius parsecs from the player
-	* Preconditions: none.
-	* @param star Pointer to the star system (cStarRecord*) to check for colonization.
+	* @param star.
 	* @return true if the star is colonizable, false otherwise.
 	*/
 	bool ColonizableStar(cStarRecord* star);
