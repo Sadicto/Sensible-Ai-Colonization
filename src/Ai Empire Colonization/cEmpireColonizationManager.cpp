@@ -141,8 +141,8 @@ void cEmpireColonizationManager::Update(int deltaTime, int deltaGameTime) {
 			}
 			int numEmpires = empires.size();
 			empireToExpand = empires.begin();
-			empiresPerSubCycle = (numEmpires + (cycleInterval / 100) - 1) / (cycleInterval / 50);
-			cycleStep = cycleInterval / (cycleInterval / 100);
+			empiresPerSubCycle = (numEmpires + (cycleInterval / 1000) - 1) / (cycleInterval / 1000);
+			cycleStep = cycleInterval / (cycleInterval / 1000);
 			lastCycleTime = 0;
 			elapsedTime = 0;
 			App::ConsolePrintF("SystemsColonized: %d", systemsColonized);
@@ -167,7 +167,7 @@ void cEmpireColonizationManager::OnModeEntered(uint32_t previousModeID, uint32_t
 				++it;
 			}
 		}
-		elapsedTime = 0;
+		elapsedTime = cycleInterval;
 		lastCycleTime = 99999999;
 		cycleStep = 99999999;
 		systemsColonized = 0;
@@ -224,8 +224,7 @@ float cEmpireColonizationManager::PlanetColonizationScore(cPlanetRecord* planet)
 
 bool cEmpireColonizationManager::ColonizableStar(cStarRecord* star) { 
 	return StarUtils::ValidStar(star) && 
-		star->GetTechLevel() != TechLevel::Empire && 
-		StarUtils::GetDistanceBetweenStars(GetActiveStarRecord(), star) < activeRadius;
+		star->GetTechLevel() != TechLevel::Empire;
 }
 
 bool cEmpireColonizationManager::EmpireCanColonizeStar(cEmpire* empire, cStarRecord* star){
@@ -277,6 +276,7 @@ void cEmpireColonizationManager::ColonizePlanet(cEmpire* empire, cPlanetRecord* 
 }
 
 float cEmpireColonizationManager::StarColonizationScore(cStarRecord* star) {
+	return 1;
 	float score = PlanetColonizationScore(BestColonizablePlanet(star).get());
 
 	if (star->GetTechLevel() == TechLevel::Tribe) {
@@ -324,11 +324,14 @@ void cEmpireColonizationManager::ExpandEmpire(cEmpire* empire) {
 	for (cStarRecordPtr empireStar : empireStars) {
 
 		eastl::vector<cStarRecordPtr> nearUnclaimedStars;
+		auto start = std::chrono::high_resolution_clock::now();
 		StarUtils::GetUnclaimedStarsInRadius(empireStar->mPosition, range, nearUnclaimedStars, true, true);
+		auto end = std::chrono::high_resolution_clock::now();
+		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+		int c = 1;
+		start = std::chrono::high_resolution_clock::now();
 		for (cStarRecordPtr nearbyStar : nearUnclaimedStars) {
-			// Planets are needed in each candidate star for the algorithm to function properly.
 			StarManager.RequirePlanetsForStar(nearbyStar.get());
-
 			// Check if the star is colonizable and the player is not currently in it.
 			if (EmpireCanColonizeStar(empire, nearbyStar.get()) && nearbyStar.get() != GetActiveStarRecord()) {
 				// If the star is not in the map, add it and calculate its base score.
@@ -342,6 +345,9 @@ void cEmpireColonizationManager::ExpandEmpire(cEmpire* empire) {
 				}
 			}
 		}
+		end = std::chrono::high_resolution_clock::now();
+		duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+		c = 4;
 		float maxScore = -1;
 		// find the Star with the highest Score.
 		for (const auto& pair : starScores) {
@@ -359,8 +365,17 @@ void cEmpireColonizationManager::ExpandEmpire(cEmpire* empire) {
 		else if (candidateStar->GetTechLevel() == TechLevel::Civilization) {
 			StarUtils::DeleteCivFromStar(candidateStar.get());
 		}
+		auto start = std::chrono::high_resolution_clock::now();
 		StarUtils::GeneratePlanets(candidateStar.get());
+		auto end = std::chrono::high_resolution_clock::now();
+		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+		int b = 7;
+		 start = std::chrono::high_resolution_clock::now();
 		ColonizeStarSystem(empire, candidateStar.get());
+		 end = std::chrono::high_resolution_clock::now();
+		 duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+		int d = 6;
+
 	}
 	else if (enableIntraSystemColonization) {
 		ColonizePlanetInOwnedSystem(empire);
@@ -377,7 +392,11 @@ void cEmpireColonizationManager::EmpiresExpansionCycle() {
 			float pOfExpansion = EmpireColonizationProbability(empireToExpand->get());
 			float n = Math::randf();
 			if (pOfExpansion > n) {
+				auto start = std::chrono::high_resolution_clock::now();
 				ExpandEmpire(empireToExpand->get());
+				auto end = std::chrono::high_resolution_clock::now();
+				auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+				int c = 0;
 			}
 			++empireToExpand;
 		}
