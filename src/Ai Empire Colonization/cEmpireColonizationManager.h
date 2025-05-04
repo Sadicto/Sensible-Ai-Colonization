@@ -7,7 +7,6 @@
 #define cEmpireColonizationManagerPtr intrusive_ptr<cEmpireColonizationManager>
 
 using namespace Simulator;
-using namespace SporeModUtils;
 
 class cEmpireColonizationManager
 	: public Simulator::cStrategy
