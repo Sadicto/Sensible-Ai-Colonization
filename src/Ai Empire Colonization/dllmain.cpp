@@ -7,9 +7,7 @@
 
 void Initialize()
 {
-	cEmpireColonizationManager* empireColonizationManager = new cEmpireColonizationManager();
-	ModAPI::AddSimulatorStrategy(empireColonizationManager, cEmpireColonizationManager::NOUN_ID);
-	cSimulatorSystem::Get()->AddStrategy(empireColonizationManager, cEmpireColonizationManager::NOUN_ID);
+	bool simulator = cSimulatorSystem::Get()->AddStrategy(new cEmpireColonizationManager(), cEmpireColonizationManager::NOUN_ID);
 	CheatManager.AddCheat("DebugAiColonization", new DebugAiColonization());
 }
 

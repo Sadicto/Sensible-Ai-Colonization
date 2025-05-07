@@ -102,6 +102,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cEmpireColonizationManager.h" />
+    <ClInclude Include="cEmpireTerraformingManager.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
     <ClInclude Include="DebugAiColonization.h">
       <SubType>
       </SubType>
@@ -116,6 +120,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cEmpireColonizationManager.cpp" />
+    <ClCompile Include="cEmpireTerraformingManager.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="DebugAiColonization.cpp">
       <SubType>
       </SubType>

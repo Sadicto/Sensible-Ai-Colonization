@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "DebugAiColonization.h"
 #include "Spore-Mod-Utils/Include/SporeModUtils.h"
+#include <chrono>
 using namespace SporeModUtils;
 using namespace Simulator;
 DebugAiColonization::DebugAiColonization()
@@ -31,12 +32,32 @@ void DebugAiColonization::ParseLine(const ArgScript::Line& line)
 		break;
 	}
 	case(3): {
+		auto start = std::chrono::high_resolution_clock::now();
 		TerraformingUtils::TerraformToTerrascore(GetActivePlanetRecord(), PlanetType::T3);
+		auto end = std::chrono::high_resolution_clock::now();
+		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+		int c = 5;
 		break;
 	}
 	case(4): {
 		cPlanetRecord* planet = GetActivePlanetRecord();
 		int c = 4;
+		break;
+	}
+	case(5): {
+		cPlanetRecord* planet = GetActivePlanetRecord();
+		planet->mCivData.clear();
+		cPlanetRecord::FillPlanetDataForTechLevel(planet, TechLevel::Empire);
+		cStarRecord* star = planet->GetStarRecord();
+		cEmpire* empire = StarManager.GetEmpire(star->mEmpireID);
+		for (auto civData : planet->mCivData) {
+			civData->mPoliticalID = planet->GetStarRecord()->mEmpireID;
+		}
+		break;
+		   }
+	case(6): {
+		TerraformingUtils::TerraformingObstacle obstacle = TerraformingUtils::GetTerraformingObstacle(GetActivePlanetRecord(), PlanetType::T3);
+		int c = 3;
 		break;
 	}
 	}
