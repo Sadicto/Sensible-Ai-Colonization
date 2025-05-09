@@ -1,13 +1,15 @@
 // dllmain.cpp : Defines the entry point for the DLL application.
 #include "stdafx.h"
 #include "cEmpireColonizationManager.h"
-
+#include "cEmpireTerraformingManager.h"
+#include "DebugAiColonization.h"
 
 
 void Initialize()
 {
-	//ModAPI::AddSimulatorStrategy(system, cEmpireColonizationManager::NOUN_ID);
-	cSimulatorSystem::Get()->AddStrategy(new cEmpireColonizationManager(), cEmpireColonizationManager::NOUN_ID);
+	bool empireColonizationManager = cSimulatorSystem::Get()->AddStrategy(new cEmpireColonizationManager(), cEmpireColonizationManager::NOUN_ID);
+	bool empireTerraformingManager = cSimulatorSystem::Get()->AddStrategy(new cEmpireTerraformingManager(), cEmpireTerraformingManager::NOUN_ID);
+	CheatManager.AddCheat("DebugAiColonization", new DebugAiColonization());
 }
 
 void Dispose()
