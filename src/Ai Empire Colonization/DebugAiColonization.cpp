@@ -107,6 +107,17 @@ void DebugAiColonization::ParseLine(const ArgScript::Line& line)
 		int b = 4;
 		break;
 	}
+	case(14): {
+		cEmpireTerraformingManager* terraformingManager = cEmpireTerraformingManager::Get();
+		int value = terraformingManager->GetTerraformingValue(GetActivePlanetRecord());
+		int b = 2;
+		break;
+	}
+	case(15): {
+		cEmpireTerraformingManager* terraformingManager = cEmpireTerraformingManager::Get();
+		cEmpire* empire = StarManager.GetEmpire(GetActiveStarRecord()->mEmpireID);
+		terraformingManager->EmpireTerraformPlanet(empire);
+	}
 	}
 }
 

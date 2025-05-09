@@ -47,8 +47,8 @@ cEmpireTerraformingManager* cEmpireTerraformingManager::instance = nullptr;
 void cEmpireTerraformingManager::Initialize() {
 	instance = this;
 	terraformAllowed = true;
-	goodSpiceTerraformAllowed = false;
-	badOrbitTerraformAllowed = true;
+	goodSpiceTerraformAllowed = true;
+	badOrbitTerraformAllowed = false;
 	levelToDecreaseAtmosphere = 0;
 	levelToIncreaseAtmosphere = 1;
 	levelToDecreaseTemperature = 2;
@@ -70,7 +70,7 @@ void cEmpireTerraformingManager::Update(int deltaTime, int deltaGameTime) {
 	if (IsSpaceGame()) {
 		elapsedTime += deltaGameTime;
 		if (elapsedTime > cycleInterval) {
-			//EmpiresTerraformingCycle();
+			EmpiresTerraformingCycle();
 			elapsedTime = 0;
 		}
 	}
@@ -94,9 +94,10 @@ bool cEmpireTerraformingManager::TerraformablePlanet(Simulator::cPlanetRecord* p
 			return true;
 		}
 		else {
+			bool playerNotInSystem =planet->GetStarRecord() != GetActiveStarRecord() ;
 			SolarSystemOrbitTemperature orbit = PlanetUtils::GetPlanetOrbitTemperature(planet);
 			bool greenOrbit = orbit == SolarSystemOrbitTemperature::Normal;
-			return (greenOrbit || (goodSpiceTerraformAllowed && !SpiceUtils::LowValueSpice(planet->mSpiceGen, spiceCosts)));
+			return playerNotInSystem && (greenOrbit || (goodSpiceTerraformAllowed && !SpiceUtils::LowValueSpice(planet->mSpiceGen, spiceCosts)));
 		}
 	}
 	return false;
@@ -104,8 +105,8 @@ bool cEmpireTerraformingManager::TerraformablePlanet(Simulator::cPlanetRecord* p
 
 bool cEmpireTerraformingManager::EmpireCanTerraformPlanet(Simulator::cEmpire* empire, Simulator::cPlanetRecord* planet) {
 	if (TerraformablePlanet(planet)) {
-		PlanetType targetTerraforming = static_cast<PlanetType>(static_cast<int>(planet->mType) + 1);
-		TerraformingUtils::TerraformingObstacle terraformingObstable = TerraformingUtils::GetTerraformingObstacle(planet, targetTerraforming);
+		PlanetType targetTerrascore = static_cast<PlanetType>(static_cast<int>(planet->mType) + 1);
+		TerraformingUtils::TerraformingObstacle terraformingObstable = TerraformingUtils::GetTerraformingObstacle(planet, targetTerrascore);
 		int empireLevel = EmpireUtils::GetEmpireLevel(empire);
 		int levelRequiredToTerraformPlanet = 0;
 
@@ -153,4 +154,73 @@ bool cEmpireTerraformingManager::EmpireCanTerraformPlanet(Simulator::cEmpire* em
 float cEmpireTerraformingManager::EmpireTerraformingProbability(Simulator::cEmpire* empire) {
 	float milisecondsInHour = 60 * 60 * 1000;
 	return std::min(1.0f, cycleInterval / milisecondsInHour);
+}
+
+int cEmpireTerraformingManager::GetTerraformingValue(Simulator::cPlanetRecord* planet) {
+	int baseValue = 1000;
+	SolarSystemOrbitTemperature orbit = PlanetUtils::GetPlanetOrbitTemperature(planet);
+	if (orbit == SolarSystemOrbitTemperature::Normal) {
+		baseValue = baseValue * 2 - 1;
+	}
+	ResourceKey planetSpice = planet->mSpiceGen;
+	ResourceKey cheapestSpice = SpiceUtils::GetCheapestSpice(spiceCosts);
+	auto itPlanet = spiceCosts.find(planetSpice);
+	if (itPlanet != spiceCosts.end()) {
+		int planetSpiceValue = itPlanet->second;
+		auto itCheapest = spiceCosts.find(cheapestSpice);
+		if (itCheapest != spiceCosts.end()) {
+			int cheapestSpiceValue = itCheapest->second;
+			return baseValue * ((planetSpiceValue + cheapestSpiceValue - 1) / cheapestSpiceValue); //division rounding up.
+		}
+		else {
+			// this should never happen.
+			return 0;
+		}
+	}
+	else {
+		return 0;
+	}
+
+
+
+}
+
+Simulator::cPlanetRecord* cEmpireTerraformingManager::GetBestTerraformablePlanetForEmpire(Simulator::cEmpire* empire) {
+	eastl::vector<cPlanetRecordPtr> empirePlanets;
+	EmpireUtils::GetEmpirePlanets(empire, empirePlanets, spiceCosts, false, false, !badOrbitTerraformAllowed, !goodSpiceTerraformAllowed);
+	int maxTerraformingValue = 0;
+	cPlanetRecord* topTerraformingPlanet = nullptr;
+	for (cPlanetRecordPtr planet : empirePlanets) {
+		if (EmpireCanTerraformPlanet(empire, planet.get())) {
+			int terraformingValue = GetTerraformingValue(planet.get());
+			if (terraformingValue > maxTerraformingValue) {
+				maxTerraformingValue = terraformingValue;
+				topTerraformingPlanet = planet.get();
+			}
+		}
+	}
+	return topTerraformingPlanet;
+}
+
+void cEmpireTerraformingManager::EmpireTerraformPlanet(Simulator::cEmpire* empire) {
+	cPlanetRecord* planetToTerraform = GetBestTerraformablePlanetForEmpire(empire);
+	if (EmpireCanTerraformPlanet(empire, planetToTerraform)) {
+		PlanetType targetTerrascore = static_cast<PlanetType>(static_cast<int>(planetToTerraform->mType) + 1);
+		TerraformingUtils::TerraformToTerrascore(planetToTerraform, targetTerrascore);
+	}
+}
+
+void cEmpireTerraformingManager::EmpiresTerraformingCycle() {
+	// Only empires within activeRadius parsecs can terraform.
+	eastl::vector <cEmpirePtr> nearEmpires;
+
+	EmpireUtils::GetEmpiresInRadius(GetActiveStarRecord()->mPosition, activeRadius, nearEmpires);
+	// For each nearby empire, calculate pOfTerraform and terraform a planet based on the probability.
+	for (cEmpirePtr empire : nearEmpires) {
+		float pOfTerraform = EmpireTerraformingProbability(empire.get());
+		float n = Math::randf();
+		if (pOfTerraform > n) {
+			EmpireTerraformPlanet(empire.get());
+		}
+	}
 }

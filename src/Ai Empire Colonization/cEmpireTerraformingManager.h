@@ -60,6 +60,15 @@ public:
 	 */
 	float EmpireTerraformingProbability(Simulator::cEmpire* empire);
 
+	/*
+	 * Returns a custom value representing how desirable it is to terraform the given planet.
+	 * Higher values indicate higher terraform priority.
+	 *
+	 * @param planet
+	 * @return A numeric score representing the terraform potential of the planet.
+	 */
+	int GetTerraformingValue(Simulator::cPlanetRecord* planet);
+
 	/**
 	 * @brief Finds the best planet that the given empire can terraform.
 	 * Prioritizes with good spice and in green orbits.
