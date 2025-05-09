@@ -2,6 +2,7 @@
 #include "DebugAiColonization.h"
 #include "Spore-Mod-Utils/Include/SporeModUtils.h"
 #include <chrono>
+#include <cEmpireTerraformingManager.h>
 using namespace SporeModUtils;
 using namespace Simulator;
 DebugAiColonization::DebugAiColonization()
@@ -56,8 +57,54 @@ void DebugAiColonization::ParseLine(const ArgScript::Line& line)
 		break;
 		   }
 	case(6): {
-		TerraformingUtils::TerraformingObstacle obstacle = TerraformingUtils::GetTerraformingObstacle(GetActivePlanetRecord(), PlanetType::T3);
-		int c = 3;
+		eastl::map<ResourceKey, float> spicesCost;
+		SpiceUtils::GetSpiceBaseCosts(spicesCost);
+		int c = 5;
+		break;
+	}
+	case(7): {
+		eastl::map<ResourceKey, float> spicesCost;
+		SpiceUtils::GetSpawnableSpiceBaseCosts(spicesCost);
+		int c = 5;
+		break;
+	}
+	case(8): {
+		eastl::map<ResourceKey, float> spicesCost;
+		SpiceUtils::GetSpawnableSpiceBaseCosts(spicesCost);
+		ResourceKey minimunSpice = SpiceUtils::GetCheapestSpice(spicesCost);
+		int d = 5;
+		break;
+	}
+	case(9): {
+		eastl::vector<cPlanetRecordPtr> planets;
+		cEmpire* empire = StarManager.GetEmpire(GetActiveStarRecord()->mEmpireID);
+		EmpireUtils::GetEmpirePlanets(empire, planets, false, false, false, true);
+		int c = 5;
+		break;
+	}
+	case(10): {
+		cEmpireTerraformingManager* terraformingManager = cEmpireTerraformingManager::Get();
+		bool terraformablePlanet = terraformingManager->TerraformablePlanet(GetActivePlanetRecord());
+		int g = 5;
+		break;
+	}
+	case(11): {
+		cEmpireTerraformingManager* terraformingManager = cEmpireTerraformingManager::Get();
+		cEmpire* empire = StarManager.GetEmpire(GetActiveStarRecord()->mEmpireID);
+		bool canTerraform = terraformingManager->EmpireCanTerraformPlanet(empire, GetActivePlanetRecord());
+		int b = 4;
+		break;
+	}
+	case(12): {
+		cEmpireTerraformingManager* terraformingManager = cEmpireTerraformingManager::Get();
+		cEmpire* empire = StarManager.GetEmpire(GetActiveStarRecord()->mEmpireID);
+		float p = terraformingManager->EmpireTerraformingProbability(empire);
+		int b = 2;
+		break;
+	}
+	case(13): {
+		TerraformingUtils::TerraformingObstacle obstable = TerraformingUtils::GetTerraformingObstacle(GetActivePlanetRecord(), static_cast<PlanetType>(static_cast<int>(GetActivePlanetRecord()->mType) + 1));
+		int b = 4;
 		break;
 	}
 	}
