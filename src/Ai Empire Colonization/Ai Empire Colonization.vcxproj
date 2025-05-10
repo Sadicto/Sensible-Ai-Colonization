@@ -101,6 +101,10 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="cEcosystemCreaturesCache.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
     <ClInclude Include="cEmpireColonizationManager.h" />
     <ClInclude Include="cEmpireTerraformingManager.h">
       <SubType>
@@ -120,6 +124,10 @@
     <ClInclude Include="Spore-Mod-Utils\TerraformingUtils\TerraformingUtils.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="cEcosystemCreaturesCache.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="cEmpireColonizationManager.cpp" />
     <ClCompile Include="cEmpireTerraformingManager.cpp">
       <SubType>

@@ -70,7 +70,7 @@ void cEmpireTerraformingManager::Update(int deltaTime, int deltaGameTime) {
 	if (IsSpaceGame()) {
 		elapsedTime += deltaGameTime;
 		if (elapsedTime > cycleInterval) {
-			EmpiresTerraformingCycle();
+			//EmpiresTerraformingCycle();
 			elapsedTime = 0;
 		}
 	}
@@ -153,7 +153,7 @@ bool cEmpireTerraformingManager::EmpireCanTerraformPlanet(Simulator::cEmpire* em
 
 float cEmpireTerraformingManager::EmpireTerraformingProbability(Simulator::cEmpire* empire) {
 	float milisecondsInHour = 60 * 60 * 1000;
-	return std::min(1.0f, cycleInterval / milisecondsInHour);
+	return std::min(1.0f, (cycleInterval * terraformingPerHour) / milisecondsInHour);
 }
 
 int cEmpireTerraformingManager::GetTerraformingValue(Simulator::cPlanetRecord* planet) {

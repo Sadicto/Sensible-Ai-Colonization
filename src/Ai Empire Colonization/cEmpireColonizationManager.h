@@ -144,7 +144,6 @@ public:
 	 * Preconditions: none.
 	 */
 	void EmpiresExpansionCycle();
-	
 
 private:
 
@@ -161,7 +160,10 @@ private:
 	float targetNumSystems;
 
 	// Average cycles necessary for an empire to reach targetNumSystems colonies.
-	float cyclesToTargetColonies;
+	//float cyclesToTargetColonies;
+
+	// Average seconds needed for an empire to colonize targetNumSystems.
+	float secondsToTargetNumSystems;
 	
 	// Colonization range per empire level, in parsecs.
 	eastl::vector<float> colonizationRange;
@@ -192,7 +194,6 @@ private:
 	ResourceKey greenSpice;
 	ResourceKey pinkSpice;
 	ResourceKey purpleSpice;
-
 
 	int elapsedTime;
 };

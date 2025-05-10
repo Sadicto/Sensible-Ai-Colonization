@@ -109,7 +109,7 @@ private:
 
 	int elapsedTime;
 
-	int terraformingPerHour;
+	float terraformingPerHour;
 
 	bool terraformAllowed;
 

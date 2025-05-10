@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "cEmpireColonizationManager.h"
 #include "cEmpireTerraformingManager.h"
+#include "cEcosystemCreaturesCache.h"
 #include "DebugAiColonization.h"
 
 
@@ -9,6 +10,7 @@ void Initialize()
 {
 	bool empireColonizationManager = cSimulatorSystem::Get()->AddStrategy(new cEmpireColonizationManager(), cEmpireColonizationManager::NOUN_ID);
 	bool empireTerraformingManager = cSimulatorSystem::Get()->AddStrategy(new cEmpireTerraformingManager(), cEmpireTerraformingManager::NOUN_ID);
+	bool ecosystemCreaturesCache = cSimulatorSystem::Get()->AddStrategy(new cEcosystemCreaturesCache(), cEcosystemCreaturesCache::NOUN_ID);
 	CheatManager.AddCheat("DebugAiColonization", new DebugAiColonization());
 }
 
@@ -17,10 +19,24 @@ void Dispose()
 	// This method is called when the game is closing
 }
 
+member_detour(GetCreatures__detour, Simulator::cStarManager, void(eastl::vector<ResourceKey>*, int, int, int, int, eastl::vector<ResourceKey>*)) {
+	void detoured(eastl::vector<ResourceKey>*a, int b, int c, int d, int e, eastl::vector<ResourceKey>*f) {
+		cEcosystemCreaturesCache* creaturesCache = cEcosystemCreaturesCache::Get();
+		if (IsSpaceGame() && creaturesCache->cacheReady) {
+			eastl::vector<ResourceKey>* cachedCreatures = creaturesCache->ReturnElement();
+			original_function(this, cachedCreatures, b, c, d, e, f);
+		}
+		else {
+			original_function(this, a, b, c, d, e, f);
+		}
+	}
+};
+
 void AttachDetours()
 {
 	// Call the attach() method on any detours you want to add
 	// For example: cViewer_SetRenderType_detour::attach(GetAddress(cViewer, SetRenderType));
+	GetCreatures__detour::attach(Address(ModAPI::ChooseAddress(0x00BABC40, 0x00BACE60)));
 }
 
 

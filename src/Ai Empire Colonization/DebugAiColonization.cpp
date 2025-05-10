@@ -3,6 +3,7 @@
 #include "Spore-Mod-Utils/Include/SporeModUtils.h"
 #include <chrono>
 #include <cEmpireTerraformingManager.h>
+#include <cEmpireColonizationManager.h>
 using namespace SporeModUtils;
 using namespace Simulator;
 DebugAiColonization::DebugAiColonization()
@@ -117,6 +118,47 @@ void DebugAiColonization::ParseLine(const ArgScript::Line& line)
 		cEmpireTerraformingManager* terraformingManager = cEmpireTerraformingManager::Get();
 		cEmpire* empire = StarManager.GetEmpire(GetActiveStarRecord()->mEmpireID);
 		terraformingManager->EmpireTerraformPlanet(empire);
+		break;
+	}
+	case(16): {
+		star = GetActiveStarRecord();
+		break;
+	}
+	case(17): {
+		empire = StarManager.GetEmpire(GetActiveStarRecord()->mEmpireID);
+		break;
+	}
+	case(18): {
+		cEmpireColonizationManagerPtr colonizationManager = cEmpireColonizationManager::Get();
+		colonizationManager->ColonizeStarSystem(empire, star);
+		break;
+	}
+	case(19): {
+		GameTimeManager.SetSpeed(3);
+		break;
+	}
+	case(20): {
+		GameTimeManager.SetSpeed(0);
+		break;
+	}
+	case(21): {
+		eastl::vector<StarID> starsKnown = GetPlayer()->mStarsKnown;
+		Simulator::StarRequestFilter filter;
+		filter.minDistance = 0;
+		filter.maxDistance = 20;
+		eastl::vector<cStarRecordPtr> stars;
+		StarManager.FindStars(GetActiveStarRecord()->mPosition, filter, stars);
+		for (cStarRecordPtr star : stars) {
+			starsKnown.push_back(star->GetID());
+		}
+
+		break;
+	}
+	case(22): {
+		eastl::vector<cEmpirePtr> empires;
+		EmpireUtils::GetEmpiresInRadius(GetActiveStarRecord()->mPosition, 1000,empires);
+		int c = 5;
+		break;
 	}
 	}
 }
