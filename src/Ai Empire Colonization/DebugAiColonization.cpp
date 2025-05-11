@@ -129,11 +129,12 @@ void DebugAiColonization::ParseLine(const ArgScript::Line& line)
 		break;
 	}
 	case(18): {
-		cEmpireColonizationManagerPtr colonizationManager = cEmpireColonizationManager::Get();
+		cEmpireColonizationManager* colonizationManager = cEmpireColonizationManager::Get();
 		colonizationManager->ColonizeStarSystem(empire, star);
 		break;
 	}
 	case(19): {
+		GameTimeManager.SetSpeedFactors(1.0, 2.0, 4.0, 20.0);
 		GameTimeManager.SetSpeed(3);
 		break;
 	}

@@ -48,14 +48,13 @@ public:
 	// You can add more methods here
 	//
 
-	static cEmpireColonizationManagerPtr Get();
+	static cEmpireColonizationManager* Get();
 
 	/**
 	 * @brief Calculates the colonization score of a planet,
 	 * with higher scores for a higher terrascore,
 	 * expensive spice, and T0 with green orbits,
 	 * and lower scores for moons.
-	 * Preconditions: none.
 	 * @param planet Pointer to the planet (cPlanetRecord*) to evaluate.
 	 * @return float score representing the colonization potential of the planet.
 	 */
@@ -80,7 +79,6 @@ public:
 
 	/**
 	 * @brief Finds the planet with the highest colonization score in a star.
-	 * Preconditions: At least one planet in the star, ColonizablePlanet(planet).
 	 * @param star Pointer to the star system (cStarRecord*) to evaluate.
 	 * @return Pointer to the best colonizable planet (cPlanetRecordPtr).
 	 */
@@ -88,7 +86,6 @@ public:
 
 	/**
 	 * @brief Colonizes the planet with the given empire. The colonized planet will have its ecosystem filled.
-	 * Preconditions: No tribes or civilization planets.
 	 * @param empire
 	 * @param planet
 	 */
@@ -96,9 +93,7 @@ public:
 
 	/**
 	 * @brief Calculates the colonization score of a star system
-	 * using its highest planet score, reducing it if the star
-	 * has tribes and further if it has a civilization.
-	 * Preconditions: At least one planet in the star, ColonizablePlanet(planet).
+	 * reducing it if the star has tribes and further if it has a civilization.
 	 * @param star Pointer to the star system (cStarRecord*) to evaluate.
 	 * @return Float score representing the colonization potential of the star.
 	 */
@@ -106,7 +101,6 @@ public:
 
 	/**
 	 * @brief Colonizes a star system with the given empire. The colonized planet will have its ecosystem filled.
-	 * Preconditions: ColonizableStar(star) and no tribes or civilizations present.
 	 * @param empire Pointer to the empire (cEmpire*) performing the colonization.
 	 * @param star Pointer to the star system (cStarRecord*) being colonized.
 	 */
@@ -120,47 +114,48 @@ public:
 	void ColonizePlanetInOwnedSystem(cEmpire* empire);
 
 	/**
-	* @brief Expands the empire to a new star system,
-	* prioritizing those closer to the homeworld, other colonies,
-	* and a higher StarColonizationScore(Star).
-	* The empire may not expand if there are no nearby colonizable stars.
-	* Will never colonize GetCurrentStar().
-	* Preconditions: none.
-	* @param empire Pointer to the empire (cEmpire*) expanding.
-	*/
+	 * @brief Expands the given empire to a new star system, prioritizing
+	 * systems that are closer to the homeworld or existing colonies,
+	 * and those with a higher StarColonizationScore(Star).
+	 * If no nearby colonizable stars are available, the empire may expand
+	 * to a planet within an already owned system.
+	 * This function will never colonize the current star (GetCurrentStar()).
+	 * @param empire
+	 */
 	void ExpandEmpire(cEmpire* empire);
+
 
 	/**
 	 * @brief Calculates the probability of an empire colonizing a new system
-	 * Preconditions: none.
 	 * @param empire Pointer to the empire (cEmpire*) being evaluated.
 	 * @return Float between 0 and 1 representing the probability of colonization.
 	 */
 	float EmpireColonizationProbability(cEmpire* empire);
 
 	/**
-	 * @brief Executes one cycle of the manager, expanding nearby empires
-	 * according to EmpireColonizationProbability(empire).
-	 * Preconditions: none.
+	 * @brief Executes a single expansion subcycle, expanding
+	 * up to empiresPerSubCycle empires based on the result of
+	 * EmpireColonizationProbability(empire).
 	 */
-	void EmpiresExpansionCycle();
+	void EmpiresExpansionSubcycle();
+
 
 private:
 
 	
-	static cEmpireColonizationManagerPtr instance;
+	static cEmpireColonizationManager* instance;
 
-	// Radius (in parsecs) in which empires colonize systems
+	// Radius (in parsecs) in which empires colonize systems, don't matter if galacticRadius = true.
 	float activeRadius;
+
+	// If the simulation extends to all the galaxy.
+	bool galacticRadius;
 
 	// Miliseconds of gameTime between expansion cycles
 	int cycleInterval;
 
 	// Number of systems for which the probabilities are calculated from.
 	float targetNumSystems;
-
-	// Average cycles necessary for an empire to reach targetNumSystems colonies.
-	//float cyclesToTargetColonies;
 
 	// Average seconds needed for an empire to colonize targetNumSystems.
 	float secondsToTargetNumSystems;
@@ -180,20 +175,25 @@ private:
 	// When colonizing within owned systems, determines whether T0 planets should be excluded.
 	bool excludeT0PlanetColonization;
 
+	// Maps each spice type to its cost, used to improve performance.
+	eastl::map<ResourceKey, float> spiceCosts;
+
+	// List of empires to be evaluated in the current expansion cycle.
 	eastl::vector<cEmpirePtr> empires;
 
+	// Number of empires evaluated per subcycle.
 	int empiresPerSubCycle;
 
-	int lastCycleTime;
-	int cycleStep;
-	int systemsColonized;
-	eastl::vector<cEmpirePtr>::iterator empireToExpand;
-	ResourceKey redSpice;
-	ResourceKey yellowSpice;
-	ResourceKey blueSpice;
-	ResourceKey greenSpice;
-	ResourceKey pinkSpice;
-	ResourceKey purpleSpice;
+	// Timestamp (in milliseconds) of the last subcycle execution.
+	int lastSubcycleTime;
 
+	// Minimum time (in milliseconds) that must pass between subcycles.
+	int subcycleStep;
+
+	// Iterator pointing to the next empire to evaluate for expansion.
+	eastl::vector<cEmpirePtr>::iterator empireToExpand;
+
+	// Time (in milliseconds) elapsed since the start of the current cycle.
 	int elapsedTime;
+
 };

@@ -156,21 +156,21 @@ float cEmpireTerraformingManager::EmpireTerraformingProbability(Simulator::cEmpi
 	return std::min(1.0f, (cycleInterval * terraformingPerHour) / milisecondsInHour);
 }
 
-int cEmpireTerraformingManager::GetTerraformingValue(Simulator::cPlanetRecord* planet) {
-	int baseValue = 1000;
+float cEmpireTerraformingManager::GetTerraformingValue(Simulator::cPlanetRecord* planet) {
+	float baseValue = 1;
 	SolarSystemOrbitTemperature orbit = PlanetUtils::GetPlanetOrbitTemperature(planet);
 	if (orbit == SolarSystemOrbitTemperature::Normal) {
-		baseValue = baseValue * 2 - 1;
+		baseValue += 0.5f;
 	}
 	ResourceKey planetSpice = planet->mSpiceGen;
 	ResourceKey cheapestSpice = SpiceUtils::GetCheapestSpice(spiceCosts);
 	auto itPlanet = spiceCosts.find(planetSpice);
 	if (itPlanet != spiceCosts.end()) {
-		int planetSpiceValue = itPlanet->second;
+		float planetSpiceValue = static_cast<float>(itPlanet->second);
 		auto itCheapest = spiceCosts.find(cheapestSpice);
 		if (itCheapest != spiceCosts.end()) {
-			int cheapestSpiceValue = itCheapest->second;
-			return baseValue * ((planetSpiceValue + cheapestSpiceValue - 1) / cheapestSpiceValue); //division rounding up.
+			float cheapestSpiceValue = static_cast<float>(itCheapest->second);
+			return baseValue + (planetSpiceValue / cheapestSpiceValue) - 1.0f;
 		}
 		else {
 			// this should never happen.
@@ -178,6 +178,7 @@ int cEmpireTerraformingManager::GetTerraformingValue(Simulator::cPlanetRecord* p
 		}
 	}
 	else {
+		// this should never happen.
 		return 0;
 	}
 

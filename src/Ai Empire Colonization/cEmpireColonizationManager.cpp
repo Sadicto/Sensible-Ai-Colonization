@@ -40,12 +40,14 @@ Simulator::Attribute cEmpireColonizationManager::ATTRIBUTES[] = {
 	Simulator::Attribute()
 };
 
-cEmpireColonizationManagerPtr cEmpireColonizationManager::instance = nullptr;
+cEmpireColonizationManager* cEmpireColonizationManager::instance = nullptr;
 
 void cEmpireColonizationManager::Initialize() {
-	instance = cEmpireColonizationManagerPtr(this);
+	instance = this;
 
 	ResourceKey speedConfigKey;
+
+	ResourceKey radiusConfigKey;
 
 	ResourceKey intraSystemColonizationKey;
 
@@ -54,8 +56,6 @@ void cEmpireColonizationManager::Initialize() {
 	PropManager.GetPropertyList(id("Config"), id("SaicConfig"), generalConfiguration);
 	
 	// General configuration.
-
-	App::Property::GetFloat(generalConfiguration.get(), 0x676FDB24, activeRadius);
 
 	App::Property::GetInt32(generalConfiguration.get(), 0x964CF55A, cycleInterval);
 
@@ -69,6 +69,8 @@ void cEmpireColonizationManager::Initialize() {
 
 	App::Property::GetKey(generalConfiguration.get(), 0x7176E6BC, speedConfigKey);
 
+	App::Property::GetKey(generalConfiguration.get(), 0x9732887C, radiusConfigKey);
+
 	App::Property::GetKey(generalConfiguration.get(), 0x21EC8183, intraSystemColonizationKey);
 
 	// Speed configuration.
@@ -76,6 +78,17 @@ void cEmpireColonizationManager::Initialize() {
 	bool found = PropManager.GetPropertyList(speedConfigKey.instanceID, speedConfigKey.groupID, speedConfiguration);
 	if (found) {
 		App::Property::GetFloat(speedConfiguration.get(), 0xD092326A, secondsToTargetNumSystems);
+	}
+	else {
+		App::ConsolePrintF("A broken installation of SensibleAiColonization was detected, please reinstall the mod.");
+	}
+
+	// Radius configuration.
+	PropertyListPtr radiusConfiguration;
+	found = PropManager.GetPropertyList(radiusConfigKey.instanceID, radiusConfigKey.groupID, radiusConfiguration);
+	if (found) {
+		App::Property::GetFloat(radiusConfiguration.get(), 0x0D00F9E5, activeRadius);
+		App::Property::GetBool(radiusConfiguration.get(), 0x02FB896F, galacticRadius);
 	}
 	else {
 		App::ConsolePrintF("A broken installation of SensibleAiColonization was detected, please reinstall the mod.");
@@ -94,25 +107,9 @@ void cEmpireColonizationManager::Initialize() {
 
 	elapsedTime = 0;
 
-	//idk if there´s a better way to do this lol.
-	eastl::string16 stringRed(u"spice1");
-	ResourceKey::Parse(redSpice, stringRed.c_str());
+	lastSubcycleTime = 0;
 
-	eastl::string16 stringYellow(u"spice3");
-	ResourceKey::Parse(yellowSpice, stringYellow.c_str());
-
-	eastl::string16 stringBlue(u"spice2");
-	ResourceKey::Parse(blueSpice, stringBlue.c_str());
-
-	eastl::string16 stringGreen(u"spice4");
-	ResourceKey::Parse(greenSpice, stringGreen.c_str());
-
-	eastl::string16 stringPink(u"spice5");
-	ResourceKey::Parse(pinkSpice, stringPink.c_str());
-
-	eastl::string16 stringPurple(u"spice6");
-	ResourceKey::Parse(purpleSpice, stringPurple.c_str());
-	
+	subcycleStep = 0;
 }
 
 void cEmpireColonizationManager::Dispose() {
@@ -122,56 +119,52 @@ void cEmpireColonizationManager::Dispose() {
 void cEmpireColonizationManager::Update(int deltaTime, int deltaGameTime) {
 	if (IsSpaceGame()) {
 		elapsedTime += deltaGameTime;
-		if (elapsedTime > lastCycleTime + cycleStep) {
-
-			while (elapsedTime > lastCycleTime) {
-				EmpiresExpansionCycle();
-				lastCycleTime += cycleStep;
-			}
-		}
+		// Start of a cycle.
 		if ( elapsedTime > cycleInterval) {
-			EmpiresMap empiresMap = StarManager.GetEmpires();
 			empires.clear();
-			for (const auto& par : empiresMap) {
-				empires.push_back(par.second);
+			if (galacticRadius) {
+				EmpiresMap empiresMap = StarManager.GetEmpires();
+				for (const auto& par : empiresMap) {
+					if (EmpireUtils::ValidNpcEmpire(par.second.get())) {
+						empires.push_back(par.second);
+					}
+				}
+				subcycleStep = 100;
+			}
+			else {
+				EmpireUtils::GetEmpiresInRadius(GetActiveStarRecord()->mPosition, activeRadius, empires);
+				subcycleStep = 1000;
 			}
 			int numEmpires = empires.size();
 			empireToExpand = empires.begin();
-			empiresPerSubCycle = (numEmpires + (cycleInterval / 100) - 1) / (cycleInterval / 100);
-			cycleStep = cycleInterval / (cycleInterval / 100);
-			lastCycleTime = 0;
+			int numSubcycles = cycleInterval / subcycleStep;
+			// Division rounding up.
+			empiresPerSubCycle = (numEmpires + numSubcycles - 1) / (numSubcycles);
+			lastSubcycleTime = 0;
 			elapsedTime = 0;
-			App::ConsolePrintF("SystemsColonized: %d", systemsColonized);
+		}
+		// Start of a subcycle.
+		if (elapsedTime > lastSubcycleTime + subcycleStep) {
+			while (elapsedTime > lastSubcycleTime) {
+				EmpiresExpansionSubcycle();
+				lastSubcycleTime += subcycleStep;
+			}
 		}
 	}
 }
 
 void cEmpireColonizationManager::OnModeEntered(uint32_t previousModeID, uint32_t newModeID) {
 	if (newModeID == GameModeIDs::kGameSpace) {
-
-		// Cleanup of the mess of the 1.0.0.
-		eastl::vector<int> field = StarManager.field_3C;
-		eastl::vector<cStar*>& starVector = *reinterpret_cast<eastl::vector<cStar*>*>(&field);
-		for (auto it = starVector.begin(); it != starVector.end(); ) {
-			cStar* star = *it;
-			if (star->mpStarRecord == nullptr) {
-				star->mpStarRecord = StarManager.GetStarRecord(0);
-				//GameNounManager.DestroyInstance(star);
-				//it = starVector.erase(it);
-			}
-			else {
-				++it;
-			}
-		}
+		spiceCosts.clear();
+		SpiceUtils::GetSpawnableSpiceBaseCosts(spiceCosts);
+		// Force the first cycle to trigger immediately on the next Update, delete before release.
 		elapsedTime = cycleInterval;
-		lastCycleTime = 99999999;
-		cycleStep = 99999999;
-		systemsColonized = 0;
+		lastSubcycleTime = 9999999;
+		subcycleStep = 9999999;
 	}
-	cStrategy::OnModeEntered(previousModeID, newModeID); //idk if it is necessary.
 }
 
-cEmpireColonizationManagerPtr cEmpireColonizationManager::Get() {
+cEmpireColonizationManager* cEmpireColonizationManager::Get() {
 	return instance;
 }
 
@@ -185,8 +178,7 @@ float cEmpireColonizationManager::PlanetColonizationScore(cPlanetRecord* planet)
     }
 	//if T0, green orbit more points.
     else { 
-        if (((planet->mFlags & kPlanetFlagRedOrbit) == 0) &&
-            ((planet->mFlags & kPlanetFlagBlueOrbit) == 0)) {
+        if (PlanetUtils::GetPlanetOrbitTemperature(planet) == SolarSystemOrbitTemperature::Normal) {
             score = score + 10;
         }
     }
@@ -195,27 +187,18 @@ float cEmpireColonizationManager::PlanetColonizationScore(cPlanetRecord* planet)
         score = score / 2;
     }
 
-    ResourceKey spiceGen = planet->mSpiceGen;
-
-    if (spiceGen == redSpice) {
-        score++;
-    }
-    else if (spiceGen == yellowSpice) {
-        score = score + 3;
-    }
-    else if (spiceGen == blueSpice) {
-        score = score + 4;
-    }
-    else if (spiceGen == greenSpice) {
-        score = score + 6;
-    }
-    else if (spiceGen == pinkSpice) {
-        score = score + 8;
-    }
-    else if (spiceGen == purpleSpice) {
-        score = score + 10;
-    }
-    return score;
+	ResourceKey planetSpice = planet->mSpiceGen;
+	ResourceKey cheapestSpice = SpiceUtils::GetCheapestSpice(spiceCosts);
+	auto itPlanet = spiceCosts.find(planetSpice);
+	if (itPlanet != spiceCosts.end()) {
+		float planetSpiceValue = static_cast<float>(itPlanet->second);
+		auto itCheapest = spiceCosts.find(cheapestSpice);
+		if (itCheapest != spiceCosts.end()) {
+			float cheapestSpiceValue = static_cast<float>(itCheapest->second);
+			score +=  (planetSpiceValue / cheapestSpiceValue) - 1.0f;
+		}
+	}
+	return score;
 }
 
 bool cEmpireColonizationManager::ColonizableStar(cStarRecord* star) { 
@@ -264,63 +247,10 @@ void cEmpireColonizationManager::ColonizePlanet(cEmpire* empire, cPlanetRecord* 
 		PlanetUtils::FillPlanetEcosystem(planet);
 	}
 	planet->mTechLevel = TechLevel::Empire;
-	/*
-	cCivData* civData = new cCivData;
-	for (int i = 0; i < 16; i++) {
-		civData->mModelKeys.push_back(WILDCARD_KEY);
-	}
-	//std::fill_n(civData->mModelKeys, 16, WILDCARD_KEY);
-	civData->mPoliticalID = empire->GetEmpireID();
-	civData->mColorID = empire->mIDColorID;
-	civData->mWealth = 0.0f;
-	civData->mNumTurrets = 0;
-	civData->mNumBuildings = 8;
-
-	cCityData* cityData = new cCityData();
-	cityData->mPosition.x = 0.0f;
-	cityData->mPosition.y = 0.0f;
-	cityData->mPosition.z = 0.0f;
-
-	cityData->mOrientation.x = 0.0f;
-	cityData->mOrientation.y = 0.0f;
-	cityData->mOrientation.z = 1.0f;
-	cityData->mOrientation.w = 0.0f;
-
-	cityData->mSpiceProduction = 0.0f;
-	cityData->mMaxSize = 0;
-	cityData->mSize = 4;
-	cityData->mTurretLocations = 0;
-	cityData->mFinalIncome = 150;
-	cityData->mHappiness = 0.0f;
-	cityData->mVehicleSpecialty = -1;
-	cityData->mCaptureID = 0xFFFFFFFF;
-	cityData->mCapturePercent = 0.0f;
-	cityData->mName = u"";
-	cityData->mDescription = u"";
-	std::fill_n(cityData->field_60, 14, 0);
-
-	cityData->mWallStyle = 0xfd701f6f;
-	cityData->mLevelHandle = 0;
-	cityData->mTextureHandle = 0;
-
-	civData->mCities.push_back(cityData);
-	planet->mCivData.push_back(civData);
-	int d = 4;
-
-
-
-	*/
-	/*
-	cPlanetRecord::FillPlanetDataForTechLevel(planet, TechLevel::Empire);
-	for (auto civData : planet->mCivData) {
-		civData->mPoliticalID = empire->GetEmpireID();
-	}
-	*/
 }
 
 float cEmpireColonizationManager::StarColonizationScore(cStarRecord* star) {
-	return 1;
-	float score = PlanetColonizationScore(BestColonizablePlanet(star).get());
+	float score = 1000;
 
 	if (star->GetTechLevel() == TechLevel::Tribe) {
 		score = score / 5;
@@ -338,7 +268,6 @@ void cEmpireColonizationManager::ColonizeStarSystem(cEmpire* empire, cStarRecord
 	star->mEmpireID = empire->GetEmpireID();;
 	cPlanetRecordPtr planet = BestColonizablePlanet(star);
 	ColonizePlanet(empire, planet.get());
-	systemsColonized++;
 }
 
 void cEmpireColonizationManager::ColonizePlanetInOwnedSystem(cEmpire* empire) {
@@ -413,7 +342,7 @@ float cEmpireColonizationManager::EmpireColonizationProbability(cEmpire* empire)
 	return std::min(1.0f,(targetNumSystems * cycleInterval) / (secondsToTargetNumSystems * 1000));
 }
 
-void cEmpireColonizationManager::EmpiresExpansionCycle() {
+void cEmpireColonizationManager::EmpiresExpansionSubcycle() {
 	for (int i = 0; i < empiresPerSubCycle; i++) {
 		if (empireToExpand != empires.end() && EmpireUtils::ValidNpcEmpire(empireToExpand->get())) {
 			float pOfExpansion = EmpireColonizationProbability(empireToExpand->get());

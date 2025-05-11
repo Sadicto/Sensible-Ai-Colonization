@@ -60,6 +60,7 @@ void cEcosystemCreaturesCache::Dispose() {
 
 void cEcosystemCreaturesCache::Update(int deltaTime, int deltaGameTime) {
 	if (IsSpaceGame()) {
+		elapsedTime += deltaGameTime;
 		if (elapsedTime > cycleInterval && cacheReady) {
 			RefreshElement();
 			elapsedTime = 0;
@@ -107,7 +108,7 @@ void cEcosystemCreaturesCache::RefreshElement() {
 	eastl::vector<ResourceKey> emptyVector;
 	CALL(Address(ModAPI::ChooseAddress(0x00BABC40, 0x00BACE60)), void, Args(Simulator::cStarManager*, eastl::vector<ResourceKey>*, int, int, int, int, eastl::vector<ResourceKey>*),
 		Args(Simulator::cStarManager::Get(), &emptyVector, 3, 2, 2, 1, nextElementToRefresh));
-	nextElementToRefresh++;
+	++nextElementToRefresh;
 	if (nextElementToRefresh == cachedEcosystemCreatures.end()) {
 		nextElementToRefresh = cachedEcosystemCreatures.begin();
 	}
@@ -116,7 +117,7 @@ void cEcosystemCreaturesCache::RefreshElement() {
 eastl::vector<ResourceKey>* cEcosystemCreaturesCache::ReturnElement() {
 	if (cacheReady) {
 		eastl::vector<ResourceKey>* element = nextElementToReturn;
-		nextElementToReturn++;
+		++nextElementToReturn;
 		if (nextElementToReturn == cachedEcosystemCreatures.end()) {
 			nextElementToReturn = cachedEcosystemCreatures.begin();
 		}

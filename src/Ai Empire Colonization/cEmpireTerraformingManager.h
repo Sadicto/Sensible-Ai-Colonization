@@ -67,7 +67,7 @@ public:
 	 * @param planet
 	 * @return A numeric score representing the terraform potential of the planet.
 	 */
-	int GetTerraformingValue(Simulator::cPlanetRecord* planet);
+	float GetTerraformingValue(Simulator::cPlanetRecord* planet);
 
 	/**
 	 * @brief Finds the best planet that the given empire can terraform.

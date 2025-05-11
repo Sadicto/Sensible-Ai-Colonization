@@ -1,4 +1,3 @@
-float activeRadious 30.0
 int32 cycleInterval 120000#30000
 float targetNumSystems 13.0
 floats empireColonizationRange
@@ -13,5 +12,7 @@ int32 levelToColonizeTribe 1
 int32 levelToColonizeCiv 3
 
 key speedConfig SaicConfig!SpeedConfig.prop
+
+key radiousConfig SaicConfig!RadiousConfig.prop
 
 key intraSystemPlanetColonizationConfig SaicConfig!IntraSystemColonizationConfig.prop

@@ -36,28 +36,49 @@ public:
 
 	static cEcosystemCreaturesCache* Get();
 
+	/**
+	 * @brief Populates the cachedEcosystemCreatures vector and
+	 * initializes the nextElementToReturn and nextElementToRefresh iterators.
+	 * Sets cacheReady to true.
+	 */
 	void PrepareCache();
 
+	/**
+	 * @brief Replaces the ecosystem at nextElementToRefresh with a new one
+	 * and advances the iterator.
+	 */
 	void RefreshElement();
 
+	/**
+	 * @brief Returns the ecosystem at nextElementToReturn and advances the iterator.
+	 * @return Pointer to a vector of ResourceKeys representing a creature ecosystem.
+	 */
 	eastl::vector<ResourceKey>* ReturnElement();
 
+	// Indicates whether the cache is ready to return elements.
 	bool cacheReady;
+
 
 private:
 	
 	static cEcosystemCreaturesCache* instance;
 
+	// Interval between cycles (in milliseconds).
 	int cycleInterval;
 
+	// Number of cached entries to store.
 	int cacheSize;
 
+	// Cached creature ecosystems, each entry is a vector of ResourceKeys.
 	eastl::vector<eastl::vector<ResourceKey>> cachedEcosystemCreatures;
 
+	// Iterator pointing to the next cached entry to return.
 	eastl::vector<eastl::vector<ResourceKey>>::iterator nextElementToReturn;
 
+	// Iterator pointing to the next cached entry to refresh.
 	eastl::vector<eastl::vector<ResourceKey>>::iterator nextElementToRefresh;
 
-
+	// Time (in milliseconds) elapsed since the last refresh.
 	int elapsedTime;
+
 };
