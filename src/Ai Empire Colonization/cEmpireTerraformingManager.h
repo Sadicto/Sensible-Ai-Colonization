@@ -105,6 +105,8 @@ private:
 
 	float activeRadius;
 
+	bool galacticRadius;
+
 	int cycleInterval;
 
 	int elapsedTime;

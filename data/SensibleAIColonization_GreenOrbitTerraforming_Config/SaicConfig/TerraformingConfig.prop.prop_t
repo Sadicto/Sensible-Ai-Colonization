@@ -1,0 +1,5 @@
+bool terraformAllowed true
+
+bool goodSpiceTerraformAllowed false
+
+bool badOrbitTerraformAllowed false

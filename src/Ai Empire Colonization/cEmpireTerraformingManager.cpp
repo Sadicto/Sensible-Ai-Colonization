@@ -46,20 +46,68 @@ cEmpireTerraformingManager* cEmpireTerraformingManager::instance = nullptr;
 
 void cEmpireTerraformingManager::Initialize() {
 	instance = this;
-	terraformAllowed = true;
-	goodSpiceTerraformAllowed = true;
-	badOrbitTerraformAllowed = false;
-	levelToDecreaseAtmosphere = 0;
-	levelToIncreaseAtmosphere = 1;
-	levelToDecreaseTemperature = 2;
-	levelToIncreaseTemperature = 3;
 
-	cycleInterval = 60000;
+	ResourceKey terraformingConfigKey;
+
+	ResourceKey terraformingSpeedConfigKey;
+
+	ResourceKey radiusConfigKey;
+
+	PropertyListPtr generalConfiguration;
+
+	PropManager.GetPropertyList(id("Config"), id("SaicConfig"), generalConfiguration);
+
+	// General configuration.
+	App::Property::GetInt32(generalConfiguration.get(), 0xABC6D7D2, cycleInterval);
+
+	App::Property::GetInt32(generalConfiguration.get(), 0x2FE6FD8A, levelToDecreaseAtmosphere);
+
+	App::Property::GetInt32(generalConfiguration.get(), 0xE2138B62, levelToIncreaseAtmosphere);
+
+	App::Property::GetInt32(generalConfiguration.get(), 0x0C8BE148, levelToDecreaseTemperature);
+
+	App::Property::GetInt32(generalConfiguration.get(), 0xF3DA8410, levelToIncreaseTemperature);
+
+	App::Property::GetKey(generalConfiguration.get(), 0x698512E7, terraformingConfigKey);
+
+	App::Property::GetKey(generalConfiguration.get(), 0x84CF94F4, terraformingSpeedConfigKey);
+
+	App::Property::GetKey(generalConfiguration.get(), 0x9732887C, radiusConfigKey);
+
+	// Terraforming configuration.
+	PropertyListPtr terraformingConfiguration;
+	bool found = PropManager.GetPropertyList(terraformingConfigKey.instanceID, terraformingConfigKey.groupID, terraformingConfiguration);
+	if (found) {
+		App::Property::GetBool(terraformingConfiguration.get(), 0xF8ADEA45, terraformAllowed);
+		App::Property::GetBool(terraformingConfiguration.get(), 0xFA3499E8, goodSpiceTerraformAllowed);
+		App::Property::GetBool(terraformingConfiguration.get(), 0x1D71500A, badOrbitTerraformAllowed);
+	}
+	else {
+		App::ConsolePrintF("A broken installation of SensibleAiColonization was detected, please reinstall the mod.");
+	}
+
+	// Terraforming speed configuration.
+	PropertyListPtr terraformingSpeedConfiguration;
+	found = PropManager.GetPropertyList(terraformingSpeedConfigKey.instanceID, terraformingSpeedConfigKey.groupID, terraformingSpeedConfiguration);
+	if (found) {
+		App::Property::GetFloat(terraformingSpeedConfiguration.get(), 0xF602D06C, terraformingPerHour);
+	}
+	else {
+		App::ConsolePrintF("A broken installation of SensibleAiColonization was detected, please reinstall the mod.");
+	}
+
+	// Radius configuration.
+	PropertyListPtr radiusConfiguration;
+	found = PropManager.GetPropertyList(radiusConfigKey.instanceID, radiusConfigKey.groupID, radiusConfiguration);
+	if (found) {
+		App::Property::GetFloat(radiusConfiguration.get(), 0x0D00F9E5, activeRadius);
+		App::Property::GetBool(radiusConfiguration.get(), 0x02FB896F, galacticRadius);
+	}
+	else {
+		App::ConsolePrintF("A broken installation of SensibleAiColonization was detected, please reinstall the mod.");
+	}
 
 	elapsedTime = 0;
-
-	terraformingPerHour = 4;
-	
 }
 
 void cEmpireTerraformingManager::Dispose() {

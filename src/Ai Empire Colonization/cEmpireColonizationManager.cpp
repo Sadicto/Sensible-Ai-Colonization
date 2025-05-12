@@ -57,7 +57,7 @@ void cEmpireColonizationManager::Initialize() {
 	
 	// General configuration.
 
-	App::Property::GetInt32(generalConfiguration.get(), 0x964CF55A, cycleInterval);
+	App::Property::GetInt32(generalConfiguration.get(), 0x54D3A437, cycleInterval);
 
 	App::Property::GetFloat(generalConfiguration.get(), 0x98199E80, targetNumSystems);
 
