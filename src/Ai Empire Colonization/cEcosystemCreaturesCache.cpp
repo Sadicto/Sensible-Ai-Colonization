@@ -106,8 +106,10 @@ void cEcosystemCreaturesCache::PrepareCache() {
 void cEcosystemCreaturesCache::RefreshElement() {
 	nextElementToRefresh->clear();
 	eastl::vector<ResourceKey> emptyVector;
+	cacheReady = false;
 	CALL(Address(ModAPI::ChooseAddress(0x00BABC40, 0x00BACE60)), void, Args(Simulator::cStarManager*, eastl::vector<ResourceKey>*, int, int, int, int, eastl::vector<ResourceKey>*),
 		Args(Simulator::cStarManager::Get(), &emptyVector, 3, 2, 2, 1, nextElementToRefresh));
+	cacheReady = true;
 	++nextElementToRefresh;
 	if (nextElementToRefresh == cachedEcosystemCreatures.end()) {
 		nextElementToRefresh = cachedEcosystemCreatures.begin();

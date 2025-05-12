@@ -1,4 +1,4 @@
-int32 cycleInterval 120000#30000
+int32 cycleInterval 120000
 float targetNumSystems 13.0
 floats empireColonizationRange
 	3.0
