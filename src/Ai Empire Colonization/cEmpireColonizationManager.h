@@ -154,6 +154,24 @@ private:
 	// Miliseconds of gameTime between expansion cycles
 	int cycleInterval;
 
+	// Number of empires evaluated per subcycle.
+	int empiresPerSubCycle;
+
+	// Timestamp (in milliseconds) of the last subcycle execution.
+	int lastSubcycleTime;
+
+	// Minimum time (in milliseconds) that must pass between subcycles.
+	int subcycleStep;
+
+	// Iterator pointing to the next empire to evaluate for expansion.
+	eastl::vector<cEmpirePtr>::iterator empireToExpand;
+
+	// List of empires to be evaluated in the current expansion cycle.
+	eastl::vector<cEmpirePtr> empires;
+
+	// Time (in milliseconds) elapsed since the start of the current cycle.
+	int elapsedTime;
+
 	// Number of systems for which the probabilities are calculated from.
 	float targetNumSystems;
 
@@ -177,23 +195,4 @@ private:
 
 	// Maps each spice type to its cost, used to improve performance.
 	eastl::map<ResourceKey, float> spiceCosts;
-
-	// List of empires to be evaluated in the current expansion cycle.
-	eastl::vector<cEmpirePtr> empires;
-
-	// Number of empires evaluated per subcycle.
-	int empiresPerSubCycle;
-
-	// Timestamp (in milliseconds) of the last subcycle execution.
-	int lastSubcycleTime;
-
-	// Minimum time (in milliseconds) that must pass between subcycles.
-	int subcycleStep;
-
-	// Iterator pointing to the next empire to evaluate for expansion.
-	eastl::vector<cEmpirePtr>::iterator empireToExpand;
-
-	// Time (in milliseconds) elapsed since the start of the current cycle.
-	int elapsedTime;
-
 };

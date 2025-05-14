@@ -88,12 +88,12 @@ public:
 	void EmpireTerraformPlanet(Simulator::cEmpire* empire);
 
 	/**
-	 * @brief Executes one cycle of the terraforming manager,
-	 * evaluating nearby empires using EmpireTerraformingProbability()
-	 * and attempting to terraform a planet if the probability check passes.
+	 * @brief Executes one subcycle of the terraforming manager,
+	 * terraforming planets of empires up to empiresPerSubCycle
+	 * based of EmpireTerraformingProbability.
 	 * Preconditions: none.
 	 */
-	void EmpiresTerraformingCycle();
+	void EmpiresTerraformingSubycle();
 
 
 
@@ -101,34 +101,57 @@ public:
 private:
 	static cEmpireTerraformingManager* instance;
 
-	eastl::map<ResourceKey, float> spiceCosts;
-
+	// Radius (in parsecs) in which empires colonize systems, don't matter if galacticRadius = true.
 	float activeRadius;
 
+	// If the simulation extends to all the galaxy.
 	bool galacticRadius;
 
+	// Miliseconds of gameTime between expansion cycles
 	int cycleInterval;
 
+	// Number of empires evaluated per subcycle.
+	int empiresPerSubCycle;
+
+	// Timestamp (in milliseconds) of the last subcycle execution.
+	int lastSubcycleTime;
+
+	// Minimum time (in milliseconds) that must pass between subcycles.
+	int subcycleStep;
+
+	// Iterator pointing to the next empire to evaluate for terraforming.
+	eastl::vector<cEmpirePtr>::iterator empireToTerraform;
+
+	// List of empires to be evaluated in the current terraforming cycle.
+	eastl::vector<cEmpirePtr> empires;
+
+	// Time (in milliseconds) elapsed since the start of the current cycle.
 	int elapsedTime;
 
+	// Average number of terraforming actions an empire performs per hour.
 	float terraformingPerHour;
 
+	// Whether AI empires are allowed to terraform.
 	bool terraformAllowed;
 
+	// Whether AI empires can terraform planets with good spice, even if they have bad orbits.
 	bool goodSpiceTerraformAllowed;
 
+	// Whether AI empires can terraform planets with bad orbits.
 	bool badOrbitTerraformAllowed;
 
+	// Empire level required to decrease a planet's atmosphere.
 	int levelToDecreaseAtmosphere;
 
+	// Empire level required to increase a planet's atmosphere.
 	int levelToIncreaseAtmosphere;
 
+	// Empire level required to decrease a planet's temperature.
 	int levelToDecreaseTemperature;
 
+	// Empire level required to increase a planet's temperature.
 	int levelToIncreaseTemperature;
 
-
-	//
-	// You can add members here
-	//
+	// Maps each spice type to its cost, used to improve performance.
+	eastl::map<ResourceKey, float> spiceCosts;
 };

@@ -157,8 +157,8 @@ void cEmpireColonizationManager::OnModeEntered(uint32_t previousModeID, uint32_t
 	if (newModeID == GameModeIDs::kGameSpace) {
 		spiceCosts.clear();
 		SpiceUtils::GetSpawnableSpiceBaseCosts(spiceCosts);
-		// Force the first cycle to trigger immediately on the next Update, delete before release.
-		elapsedTime = cycleInterval;
+		// Randomizes the start of the first cycle to avoid being synchronized with the cycles of other managers.
+		elapsedTime = Math::rand(cycleInterval / 2);
 		lastSubcycleTime = 9999999;
 		subcycleStep = 9999999;
 	}

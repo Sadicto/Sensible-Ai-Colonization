@@ -161,6 +161,10 @@ void DebugAiColonization::ParseLine(const ArgScript::Line& line)
 		int c = 5;
 		break;
 	}
+	case(23): {
+		cEmpireTerraformingManager* terraformingManager = cEmpireTerraformingManager::Get();
+		terraformingManager->TerraformablePlanet(GetActivePlanetRecord());
+	}
 	}
 }
 

@@ -117,9 +117,36 @@ void cEmpireTerraformingManager::Dispose() {
 void cEmpireTerraformingManager::Update(int deltaTime, int deltaGameTime) {
 	if (IsSpaceGame()) {
 		elapsedTime += deltaGameTime;
+		// Start of a cycle.
 		if (elapsedTime > cycleInterval) {
-			//EmpiresTerraformingCycle();
+			empires.clear();
+			if (galacticRadius) {
+				EmpiresMap empiresMap = StarManager.GetEmpires();
+				for (const auto& par : empiresMap) {
+					if (EmpireUtils::ValidNpcEmpire(par.second.get())) {
+						empires.push_back(par.second);
+					}
+				}
+				subcycleStep = 100;
+			}
+			else {
+				EmpireUtils::GetEmpiresInRadius(GetActiveStarRecord()->mPosition, activeRadius, empires);
+				subcycleStep = 1000;
+			}
+			int numEmpires = empires.size();
+			empireToTerraform = empires.begin();
+			int numSubcycles = cycleInterval / subcycleStep;
+			// Division rounding up.
+			empiresPerSubCycle = (numEmpires + numSubcycles - 1) / (numSubcycles);
+			lastSubcycleTime = 0;
 			elapsedTime = 0;
+		}
+		// Start of a subcycle.
+		if (elapsedTime > lastSubcycleTime + subcycleStep) {
+			while (elapsedTime > lastSubcycleTime) {
+				EmpiresTerraformingSubycle();
+				lastSubcycleTime += subcycleStep;
+			}
 		}
 	}
 }
@@ -128,7 +155,10 @@ void cEmpireTerraformingManager::OnModeEntered(uint32_t previousModeID, uint32_t
 	if (newModeID == GameModeIDs::kGameSpace) {
 		spiceCosts.clear();
 		SpiceUtils::GetSpawnableSpiceBaseCosts(spiceCosts);
-		elapsedTime = 0;
+		// Randomizes the start of the first cycle to avoid being synchronized with the cycles of other managers.
+		elapsedTime = Math::rand(cycleInterval / 2);
+		lastSubcycleTime = 9999999;
+		subcycleStep = 9999999;
 	}
 }
 
@@ -138,11 +168,11 @@ cEmpireTerraformingManager* cEmpireTerraformingManager::Get() {
 
 bool cEmpireTerraformingManager::TerraformablePlanet(Simulator::cPlanetRecord* planet) {
 	if (PlanetUtils::InteractablePlanet(planet) && planet->mType != PlanetType::T3) {
+		bool playerNotInSystem = planet->GetStarRecord() != GetActiveStarRecord();
 		if (badOrbitTerraformAllowed) {
-			return true;
+			return playerNotInSystem;
 		}
 		else {
-			bool playerNotInSystem =planet->GetStarRecord() != GetActiveStarRecord() ;
 			SolarSystemOrbitTemperature orbit = PlanetUtils::GetPlanetOrbitTemperature(planet);
 			bool greenOrbit = orbit == SolarSystemOrbitTemperature::Normal;
 			return playerNotInSystem && (greenOrbit || (goodSpiceTerraformAllowed && !SpiceUtils::LowValueSpice(planet->mSpiceGen, spiceCosts)));
@@ -209,6 +239,9 @@ float cEmpireTerraformingManager::GetTerraformingValue(Simulator::cPlanetRecord*
 	SolarSystemOrbitTemperature orbit = PlanetUtils::GetPlanetOrbitTemperature(planet);
 	if (orbit == SolarSystemOrbitTemperature::Normal) {
 		baseValue += 0.5f;
+		if (planet->mType == PlanetType::T0) {
+			baseValue += 0.1f;
+		}
 	}
 	ResourceKey planetSpice = planet->mSpiceGen;
 	ResourceKey cheapestSpice = SpiceUtils::GetCheapestSpice(spiceCosts);
@@ -236,12 +269,12 @@ float cEmpireTerraformingManager::GetTerraformingValue(Simulator::cPlanetRecord*
 
 Simulator::cPlanetRecord* cEmpireTerraformingManager::GetBestTerraformablePlanetForEmpire(Simulator::cEmpire* empire) {
 	eastl::vector<cPlanetRecordPtr> empirePlanets;
-	EmpireUtils::GetEmpirePlanets(empire, empirePlanets, spiceCosts, false, false, !badOrbitTerraformAllowed, !goodSpiceTerraformAllowed);
-	int maxTerraformingValue = 0;
+	EmpireUtils::GetEmpirePlanets(empire, empirePlanets, spiceCosts, false, false, !(badOrbitTerraformAllowed || goodSpiceTerraformAllowed), (goodSpiceTerraformAllowed && !badOrbitTerraformAllowed));
+	float maxTerraformingValue = 0.0f;
 	cPlanetRecord* topTerraformingPlanet = nullptr;
 	for (cPlanetRecordPtr planet : empirePlanets) {
 		if (EmpireCanTerraformPlanet(empire, planet.get())) {
-			int terraformingValue = GetTerraformingValue(planet.get());
+			float terraformingValue = GetTerraformingValue(planet.get());
 			if (terraformingValue > maxTerraformingValue) {
 				maxTerraformingValue = terraformingValue;
 				topTerraformingPlanet = planet.get();
@@ -259,17 +292,15 @@ void cEmpireTerraformingManager::EmpireTerraformPlanet(Simulator::cEmpire* empir
 	}
 }
 
-void cEmpireTerraformingManager::EmpiresTerraformingCycle() {
-	// Only empires within activeRadius parsecs can terraform.
-	eastl::vector <cEmpirePtr> nearEmpires;
-
-	EmpireUtils::GetEmpiresInRadius(GetActiveStarRecord()->mPosition, activeRadius, nearEmpires);
-	// For each nearby empire, calculate pOfTerraform and terraform a planet based on the probability.
-	for (cEmpirePtr empire : nearEmpires) {
-		float pOfTerraform = EmpireTerraformingProbability(empire.get());
-		float n = Math::randf();
-		if (pOfTerraform > n) {
-			EmpireTerraformPlanet(empire.get());
+void cEmpireTerraformingManager::EmpiresTerraformingSubycle() {
+	for (int i = 0; i < empiresPerSubCycle; i++) {
+		if (empireToTerraform != empires.end() && EmpireUtils::ValidNpcEmpire(empireToTerraform->get())) {
+			float pOfTerraforming = EmpireTerraformingProbability(empireToTerraform->get());
+			float n = Math::randf();
+			if (pOfTerraforming > n) {
+				EmpireTerraformPlanet(empireToTerraform->get());
+			}
+			++empireToTerraform;
 		}
 	}
 }
