@@ -44,7 +44,7 @@ cEmpireColonizationManager* cEmpireColonizationManager::instance = nullptr;
 
 void cEmpireColonizationManager::Initialize() {
 	instance = this;
-
+	
 	ResourceKey speedConfigKey;
 
 	ResourceKey radiusConfigKey;
@@ -133,7 +133,13 @@ void cEmpireColonizationManager::Update(int deltaTime, int deltaGameTime) {
 			}
 			else {
 				EmpireUtils::GetEmpiresInRadius(GetActiveStarRecord()->mPosition, activeRadius, empires);
-				subcycleStep = 1000;
+				if (activeRadius <= 100) {
+					subcycleStep = 1000;
+				}
+				else {
+					subcycleStep = 300;
+				}
+
 			}
 			int numEmpires = empires.size();
 			empireToExpand = empires.begin();
@@ -247,6 +253,8 @@ void cEmpireColonizationManager::ColonizePlanet(cEmpire* empire, cPlanetRecord* 
 		PlanetUtils::FillPlanetEcosystem(planet);
 	}
 	planet->mTechLevel = TechLevel::Empire;
+	cPlanetRecord::FillPlanetDataForTechLevel(planet, TechLevel::Empire);
+	int c = 4;
 }
 
 float cEmpireColonizationManager::StarColonizationScore(cStarRecord* star) {
@@ -284,7 +292,7 @@ void cEmpireColonizationManager::ColonizePlanetInOwnedSystem(cEmpire* empire) {
 }
 
 void cEmpireColonizationManager::ExpandEmpire(cEmpire* empire) {
-	cStarRecord* homeworld = empire->GetHomeStarRecord();
+	cStarRecord* homeworld = EmpireUtils::GetHomeStar(empire);
 	float range = colonizationRange[EmpireUtils::GetEmpireLevel(empire)];
 	eastl::vector<cStarRecordPtr> empireStars = empire->mStars;
 	cStarRecordPtr candidateStar = NULL;

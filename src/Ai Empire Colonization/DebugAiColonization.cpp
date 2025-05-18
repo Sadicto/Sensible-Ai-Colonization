@@ -125,6 +125,7 @@ void DebugAiColonization::ParseLine(const ArgScript::Line& line)
 		break;
 	}
 	case(17): {
+
 		empire = StarManager.GetEmpire(GetActiveStarRecord()->mEmpireID);
 		break;
 	}

@@ -32,11 +32,18 @@ member_detour(GetCreatures__detour, Simulator::cStarManager, void(eastl::vector<
 	}
 };
 
+member_detour(RequireHomePlanet__detour, Simulator::cEmpire, Simulator::cPlanetRecord* ()) {
+	cPlanetRecord* detoured() {
+		return original_function(this);
+	}
+};
+
 void AttachDetours()
 {
 	// Call the attach() method on any detours you want to add
 	// For example: cViewer_SetRenderType_detour::attach(GetAddress(cViewer, SetRenderType));
 	GetCreatures__detour::attach(Address(ModAPI::ChooseAddress(0x00BABC40, 0x00BACE60)));
+	//RequireHomePlanet__detour::attach(GetAddress(Simulator::cEmpire, RequireHomePlanet));
 }
 
 
