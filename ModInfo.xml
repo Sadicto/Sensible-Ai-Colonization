@@ -1,23 +1,78 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <mod description="This mod improves how AI empires expand in the Space Stage. Instead of random or unrealistic expansion, empires now prioritize colonizing nearby star systems, especially those with habitable planets and valuable spice. As the empire grows, it focuses on filling in gaps near existing colonies. Within each star system, the AI always chooses the best available planet for colonization based on habitability and spice value." displayName="Sensible Ai Colonization" dllsBuild="$SPOREMOD_DLLS_BUILD" githubUrl="https://github.com/Sadicto/Sensible-Ai-Colonization" hasCustomInstaller="true" installerSystemVersion="1.0.1.2" isExperimental="$SPOREMOD_EXPERIMENTAL" unique="SensibleAiColonization" websiteUrl="https://github.com/Sadicto/Sensible-Ai-Colonization">
-  <componentGroup displayName="AI Colonization Speed" unique="SensibleAiColonization_Speed_Config">
-    <component game="GalacticAdventures" displayName="Extremely Slow Expansion" description="On average, empires will take 5 hours to reach 13 systems." unique ="SensibleAIColonization_ExtremelySlowSpeed_Config" defaultChecked="false">SensibleAIColonization_ExtremelySlowSpeed_Config.package</component>
-    <component game="GalacticAdventures" displayName="Very Slow Expansion" description="On average, empires will take 3 hours to reach 13 systems." unique ="SensibleAIColonization_VerySlowSpeed_Config" defaultChecked="false">SensibleAIColonization_VerySlowSpeed_Config.package</component>
-    <component game="GalacticAdventures" displayName="Slow Expansion" description="On average, empires will take 2 hours to reach 13 systems." unique ="SensibleAIColonization_SlowSpeed_Config" defaultChecked="false">SensibleAIColonization_SlowSpeed_Config.package</component>
-    <component game="GalacticAdventures" displayName="Normal Expansion" description="On average, empires will take 1 hour and 30 minutes to reach 13 systems." unique ="SensibleAIColonization_NormalSpeed_Config" defaultChecked="true">SensibleAIColonization_NormalSpeed_Config.package</component>
-    <component game="GalacticAdventures" displayName="Fast Expansion" description="On average, empires will take 1 hour to reach 13 systems." unique ="SensibleAIColonization_FastSpeed_Config" defaultChecked="false">SensibleAIColonization_FastSpeed_Config.package</component>
-    <component game="GalacticAdventures" displayName="Very Fast Expansion" description = "On average, empires will take 40 minutes to reach 13 systems." unique="SensibleAIColonization_VeryFastSpeed_Config" defaultChecked="false">SensibleAIColonization_VeryFastSpeed_Config.package</component>
-    <component game="GalacticAdventures" displayName="Extremely Fast Expansion" description = "On average, empires will take 30 minutes to reach 13 systems." unique="SensibleAIColonization_ExtremelyFastSpeed_Config" defaultChecked="false">SensibleAIColonization_ExtremelyFastSpeed_Config.package</component>
-  </componentGroup>
-  <prerequisite game="GalacticAdventures">SensibleAIColonization_Main.package</prerequisite>
-  <prerequisite>Ai Empire Colonization.dll</prerequisite>
-  <remove game="GalacticAdventures">SensibleAIColonization_Main.package</remove>
-  <remove>Ai Empire Colonization.dll</remove>
-  <remove game="GalacticAdventures">SensibleAIColonization_ExtremelySlowSpeed_Config.package</remove>
-  <remove game="GalacticAdventures">SensibleAIColonization_VerySlowSpeed_Config.package</remove>
-  <remove game="GalacticAdventures">SensibleAIColonization_SlowSpeed_Config.package</remove>
-  <remove game="GalacticAdventures">SensibleAIColonization_NormalSpeed_Config.package</remove>
-  <remove game="GalacticAdventures">SensibleAIColonization_FastSpeed_Config.package</remove>
-  <remove game="GalacticAdventures">SensibleAIColonization_VeryFastSpeed_Config.package</remove>
-  <remove game="GalacticAdventures">SensibleAIColonization_ExtremelyFastSpeed_Config.package</remove>
+	<!-- SpeedConfig -->
+	<componentGroup displayName="AI Colonization Speed" unique="SensibleAiColonization_Speed_Config">
+		<component game="GalacticAdventures" displayName="Extremely Slow Expansion" description="On average, empires will take 5 hours to reach 13 systems." unique ="SensibleAIColonization_ExtremelySlowSpeed_Config" defaultChecked="false">SensibleAIColonization_ExtremelySlowSpeed_Config.package</component>
+		<component game="GalacticAdventures" displayName="Very Slow Expansion" description="On average, empires will take 3 hours to reach 13 systems." unique ="SensibleAIColonization_VerySlowSpeed_Config" defaultChecked="false">SensibleAIColonization_VerySlowSpeed_Config.package</component>
+		<component game="GalacticAdventures" displayName="Slow Expansion" description="On average, empires will take 2 hours to reach 13 systems." unique ="SensibleAIColonization_SlowSpeed_Config" defaultChecked="false">SensibleAIColonization_SlowSpeed_Config.package</component>
+		<component game="GalacticAdventures" displayName="Normal Expansion" description="On average, empires will take 1 hour and 30 minutes to reach 13 systems." unique ="SensibleAIColonization_NormalSpeed_Config" defaultChecked="true">SensibleAIColonization_NormalSpeed_Config.package</component>
+		<component game="GalacticAdventures" displayName="Fast Expansion" description="On average, empires will take 1 hour to reach 13 systems." unique ="SensibleAIColonization_FastSpeed_Config" defaultChecked="false">SensibleAIColonization_FastSpeed_Config.package</component>
+		<component game="GalacticAdventures" displayName="Very Fast Expansion" description = "On average, empires will take 40 minutes to reach 13 systems." unique="SensibleAIColonization_VeryFastSpeed_Config" defaultChecked="false">SensibleAIColonization_VeryFastSpeed_Config.package</component>
+		<component game="GalacticAdventures" displayName="Extremely Fast Expansion" description = "On average, empires will take 30 minutes to reach 13 systems." unique="SensibleAIColonization_ExtremelyFastSpeed_Config" defaultChecked="false">SensibleAIColonization_ExtremelyFastSpeed_Config.package</component>
+	</componentGroup>
+	<!-- RadiusConfig -->
+	<componentGroup displayName="Active Radius" unique="SensibleAiColonization_Radius_Config">
+		<component game="GalacticAdventures" displayName="40 pc" description="Only empires within 40 pc of the player will colonize or terraform planets." unique ="SensibleAIColonization_40Radius_Config" defaultChecked="false">SensibleAIColonization_40Radius_Config.package</component>
+		<component game="GalacticAdventures" displayName="60 pc" description="Only empires within 60 pc of the player will colonize or terraform planets." unique ="SensibleAIColonization_60Radius_Config" defaultChecked="false">SensibleAIColonization_60Radius_Config.package</component>
+		<component game="GalacticAdventures" displayName="100 pc" description="Only empires within 100 pc of the player will colonize or terraform planets." unique ="SensibleAIColonization_100Radius_Config" defaultChecked="true">SensibleAIColonization_100Radius_Config.package</component>
+		<component game="GalacticAdventures" displayName="200 pc" description="Only empires within 200 pc of the player will colonize or terraform planets." unique ="SensibleAIColonization_200Radius_Config" defaultChecked="false">SensibleAIColonization_200Radius_Config.package</component>
+	</componentGroup>
+	<!-- IntraSystemConfig -->
+	<componentGroup displayName="Intra-System Colonization" unique="SensibleAiColonization_IntraSystemColonization_Config">
+		<component game="GalacticAdventures" displayName="Disabled" description="Empires will not colonize planets in already owned systems" unique ="SensibleAiColonization_DisabledIntraSystemColonization_Config" defaultChecked="false">SensibleAiColonization_DisabledIntraSystemColonization_Config.package</component>
+		<component game="GalacticAdventures" displayName="Only Habitable" description="When colonizing within an already owned system, empires will only colonizable habitable planets." unique ="SensibleAiColonization_OnlyHabitablePlanetsIntraSystemColonization_Config" defaultChecked="true">SensibleAiColonization_OnlyHabitablePlanetsIntraSystemColonization_Config.package</component>
+		<component game="GalacticAdventures" displayName="Any" description="When colonizing within an already owned system, empires can colonize any planet." unique ="SensibleAiColonization_AllPlanetsIntraSystemColonization_Config" defaultChecked="false">SensibleAiColonization_AllPlanetsIntraSystemColonization_Config.package</component>
+	</componentGroup>
+	<!-- TerraformingConfig -->
+	<componentGroup displayName="Terraforming Configuration" unique="SensibleAiColonization_Terraforming_Config">
+		<component game="GalacticAdventures" displayName="Disabled" description="Empires will not terraform their planets" unique ="SensibleAIColonization_NoTerraforming_Config" defaultChecked="false">SensibleAIColonization_NoTerraforming_Config.package</component>
+		<component game="GalacticAdventures" displayName="Only Green Orbit" description="Empires will only terraform planets with green orbits." unique ="SensibleAIColonization_GreenOrbitTerraforming_Config" defaultChecked="false">SensibleAIColonization_GreenOrbitTerraforming_Config.package</component>
+		<component game="GalacticAdventures" displayName="Only Green Orbit or High-Value Spice" description="Empires will only terraform planets with green orbits or planets that have high-value spice (green, pink, or purple in vanilla)." unique ="SensibleAIColonization_GreenOrbitGoodSpiceTerraforming_Config" defaultChecked="true">SensibleAIColonization_GreenOrbitGoodSpiceTerraforming_Config.package</component>
+		<component game="GalacticAdventures" displayName="Any" description="Empires can terraform any planet." unique ="SensibleAiColonization_AllPlanetsIntraSystemColonization_Config" defaultChecked="false">SensibleAiColonization_AllPlanetsIntraSystemColonization_Config.package</component>
+	</componentGroup>
+	<!-- TerraformingSpeedConfig -->
+	<componentGroup displayName="Terraforming Speed Configuration" unique="SensibleAiColonization_TerraformingSpeed_Config">
+		<component game="GalacticAdventures" displayName="Extremely Slow Terraforming" description="On average, empires will terraform 1 planet every 5 hours" unique ="SensibleAIColonization_ExtremelySlowTerraformingSpeed_Config" defaultChecked="false">SensibleAIColonization_ExtremelySlowTerraformingSpeed_Config.package</component>
+		<component game="GalacticAdventures" displayName="Very Slow Terraforming" description="On average, empires will terraform 1 planet every 3 hours" unique ="SensibleAIColonization_VerySlowTerraformingSpeed_Config" defaultChecked="false">SensibleAIColonization_VerySlowTerraformingSpeed_Config.package</component>
+		<component game="GalacticAdventures" displayName="Slow Terraforming" description="On average, empires will terraform 1 planet every 2 hours" unique ="SensibleAIColonization_SlowTerraformingSpeed_Config" defaultChecked="false">SensibleAIColonization_SlowTerraformingSpeed_Config.package</component>
+		<component game="GalacticAdventures" displayName="Normal Terraforming" description="On average, empires will terraform 1 planet every 45 minutes" unique ="SensibleAIColonization_NormalTerraformingSpeed_Config" defaultChecked="true">SensibleAIColonization_NormalTerraformingSpeed_Config.package</component>
+		<component game="GalacticAdventures" displayName="Fast Terraforming" description="On average, empires will terraform 1 planet every 30 minutes" unique ="SensibleAIColonization_FastTerraformingSpeed_Config" defaultChecked="false">SensibleAIColonization_FastTerraformingSpeed_Config.package</component>
+		<component game="GalacticAdventures" displayName="Very Fast Terraforming" description="On average, empires will terraform 1 planet every 20 minutes" unique ="SensibleAIColonization_VeryFastTerraformingSpeed_Config" defaultChecked="false">SensibleAIColonization_VeryFastTerraformingSpeed_Config.package</component>
+		<component game="GalacticAdventures" displayName="Extremely Fast Terraforming" description="On average, empires will terraform 1 planet every 10 minutes" unique ="SensibleAIColonization_ExtremelyFastTerraformingSpeed_Config" defaultChecked="false">SensibleAIColonization_ExtremelyFastTerraformingSpeed_Config.package</component>
+	</componentGroup>
+	<!-- Main -->
+	<prerequisite game="GalacticAdventures">SensibleAIColonization_Main.package</prerequisite>
+	<prerequisite>Ai Empire Colonization.dll</prerequisite>
+	<remove game="GalacticAdventures">SensibleAIColonization_Main.package</remove>
+	<remove>Ai Empire Colonization.dll</remove>
+	<!-- SpeedConfig -->
+	<remove game="GalacticAdventures">SensibleAIColonization_ExtremelySlowSpeed_Config.package</remove>
+	<remove game="GalacticAdventures">SensibleAIColonization_VerySlowSpeed_Config.package</remove>
+	<remove game="GalacticAdventures">SensibleAIColonization_SlowSpeed_Config.package</remove>
+	<remove game="GalacticAdventures">SensibleAIColonization_NormalSpeed_Config.package</remove>
+	<remove game="GalacticAdventures">SensibleAIColonization_FastSpeed_Config.package</remove>
+	<remove game="GalacticAdventures">SensibleAIColonization_VeryFastSpeed_Config.package</remove>
+	<remove game="GalacticAdventures">SensibleAIColonization_ExtremelyFastSpeed_Config.package</remove>
+	<!-- RadiusConfig -->
+	<remove game="GalacticAdventures">SensibleAIColonization_40Radius_Config.package</remove>
+	<remove game="GalacticAdventures">SensibleAIColonization_60Radius_Config.package</remove>
+	<remove game="GalacticAdventures">SensibleAIColonization_100Radius_Config.package</remove>
+	<remove game="GalacticAdventures">SensibleAIColonization_200Radius_Config.package</remove>
+	<!-- IntraSystemConfig -->
+	<remove game="GalacticAdventures">SensibleAiColonization_DisabledIntraSystemColonization_Config.package</remove>
+	<remove game="GalacticAdventures">SensibleAiColonization_OnlyHabitablePlanetsIntraSystemColonization_Config.package</remove>
+	<remove game="GalacticAdventures">SensibleAiColonization_AllPlanetsIntraSystemColonization_Config.package</remove>
+	<!-- TerraformingConfig -->
+	<remove game="GalacticAdventures">SensibleAIColonization_NoTerraforming_Config.package</remove>
+	<remove game="GalacticAdventures">SensibleAIColonization_GreenOrbitTerraforming_Config.package</remove>
+	<remove game="GalacticAdventures">SensibleAIColonization_GreenOrbitGoodSpiceTerraforming_Config.package</remove>
+	<remove game="GalacticAdventures">SensibleAIColonization_AllPlanetsTerraforming_Config.package</remove>
+	<!-- TerraformingSpeedConfig -->
+	<remove game="GalacticAdventures">SensibleAIColonization_ExtremelySlowTerraformingSpeed_Config.package</remove>
+	<remove game="GalacticAdventures">SensibleAIColonization_VerySlowTerraformingSpeed_Config.package</remove>
+	<remove game="GalacticAdventures">SensibleAIColonization_SlowTerraformingSpeed_Config.package</remove>
+	<remove game="GalacticAdventures">SensibleAIColonization_NormalTerraformingSpeed_Config.package</remove>
+	<remove game="GalacticAdventures">SensibleAIColonization_FastTerraformingSpeed_Config.package</remove>
+	<remove game="GalacticAdventures">SensibleAIColonization_VeryFastTerraformingSpeed_Config.package</remove>
+	<remove game="GalacticAdventures">SensibleAIColonization_ExtremelyFastTerraformingSpeed_Config.package</remove>
 </mod>
