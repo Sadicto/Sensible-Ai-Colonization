@@ -1,5 +1,5 @@
-int32 colonizationCycleInterval 120000
-int32 terraformingCycleInterval 300000
+int32 colonizationCycleInterval 120000 # 2 minutes.
+int32 terraformingCycleInterval 300000 # 5 minutes.
 float targetNumSystems 13.0
 floats empireColonizationRange
 	3.0
