@@ -28,7 +28,7 @@
 		<component game="GalacticAdventures" displayName="Disabled" description="Empires will not terraform their planets" unique ="SensibleAIColonization_NoTerraforming_Config" defaultChecked="false">SensibleAIColonization_NoTerraforming_Config.package</component>
 		<component game="GalacticAdventures" displayName="Only Green Orbit" description="Empires will only terraform planets with green orbits." unique ="SensibleAIColonization_GreenOrbitTerraforming_Config" defaultChecked="false">SensibleAIColonization_GreenOrbitTerraforming_Config.package</component>
 		<component game="GalacticAdventures" displayName="Only Green Orbit or High-Value Spice" description="Empires will only terraform planets with green orbits or planets that have high-value spice (green, pink, or purple in vanilla)." unique ="SensibleAIColonization_GreenOrbitGoodSpiceTerraforming_Config" defaultChecked="true">SensibleAIColonization_GreenOrbitGoodSpiceTerraforming_Config.package</component>
-		<component game="GalacticAdventures" displayName="Any" description="Empires can terraform any planet." unique ="SensibleAiColonization_AllPlanetsIntraSystemColonization_Config" defaultChecked="false">SensibleAiColonization_AllPlanetsIntraSystemColonization_Config.package</component>
+		<component game="GalacticAdventures" displayName="Any" description="Empires can terraform any planet." unique ="SensibleAIColonization_AllPlanetsTerraforming_Config" defaultChecked="false">SensibleAIColonization_AllPlanetsTerraforming_Config.package</component>
 	</componentGroup>
 	<!-- TerraformingSpeedConfig -->
 	<componentGroup displayName="Terraforming Speed Configuration" unique="SensibleAiColonization_TerraformingSpeed_Config">
