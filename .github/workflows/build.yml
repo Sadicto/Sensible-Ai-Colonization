@@ -85,6 +85,7 @@ jobs:
     name: Build Project .package
     needs: find-package-projects
     runs-on: ubuntu-latest
+    if: ${{ toJSON(fromJSON(needs.find-package-projects.outputs.matrix).project) != '[]' }}
     strategy:
       matrix: ${{ fromJSON(needs.find-package-projects.outputs.matrix) }}
     steps:
