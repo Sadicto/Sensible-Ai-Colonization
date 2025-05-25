@@ -12,6 +12,9 @@ This mod fixes that by making empires expand in a more cohesive and strategic wa
 - When colonizing a star system, the AI will always pick the best planet available.
 - Once an empire reaches a high enough strength factor, it will start conquering systems inhabited by tribes or civilizations.
 - The speed at which empires expand can be customized when the mod is installed.
+- The radius around the player within which empires can expand is customizable when the mod is installed.
+- Once an empire has no nearby colonizable stars, it will begin colonizing planets within already owned star systems. This behavior can be customized when installing the mod.
+- Empires will terraform planets within their owned star systems. This behavior can be customized when installing the mod.
 - AI avoids colonizing special systems like Sol, systems with monoliths, save file stars, etc.
 - The Grox and empires from other saves are not affected by this mod.
 
