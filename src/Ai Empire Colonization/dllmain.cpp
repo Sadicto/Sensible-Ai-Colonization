@@ -4,6 +4,7 @@
 #include "cEmpireTerraformingManager.h"
 #include "cEcosystemCreaturesCache.h"
 #include "DebugAiColonization.h"
+#include "SaicRemoveTribe.h"
 
 
 void Initialize()
@@ -11,7 +12,8 @@ void Initialize()
 	bool empireColonizationManager = cSimulatorSystem::Get()->AddStrategy(new cEmpireColonizationManager(), cEmpireColonizationManager::NOUN_ID);
 	bool empireTerraformingManager = cSimulatorSystem::Get()->AddStrategy(new cEmpireTerraformingManager(), cEmpireTerraformingManager::NOUN_ID);
 	bool ecosystemCreaturesCache = cSimulatorSystem::Get()->AddStrategy(new cEcosystemCreaturesCache(), cEcosystemCreaturesCache::NOUN_ID);
-	//CheatManager.AddCheat("DebugAiColonization", new DebugAiColonization());
+	// CheatManager.AddCheat("DebugAiColonization", new DebugAiColonization());
+	CheatManager.AddCheat("SaicRemoveTribe", new SaicRemoveTribe());
 }
 
 void Dispose()

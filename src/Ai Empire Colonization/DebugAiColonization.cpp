@@ -30,20 +30,32 @@ void DebugAiColonization::ParseLine(const ArgScript::Line& line)
 		break;
 	}
 	case(2): {
-		TerraformingUtils::TerraformToTerrascore(GetActivePlanetRecord(), PlanetType::T2);
+		cStarRecord* star = GetActiveStarRecord();
 		break;
 	}
 	case(3): {
-		auto start = std::chrono::high_resolution_clock::now();
-		TerraformingUtils::TerraformToTerrascore(GetActivePlanetRecord(), PlanetType::T3);
-		auto end = std::chrono::high_resolution_clock::now();
-		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-		int c = 5;
+		StarRequestFilter filter;
+		filter.techLevels = 0;
+		filter.minDistance = 0;
+		filter.maxDistance = 100;
+		filter.AddTechLevel(TechLevel::Tribe);
+		eastl::vector<cStarRecordPtr> stars;
+		StarManager.FindStars(GetActiveStarRecord()->mPosition, filter, stars);
 		break;
 	}
 	case(4): {
-		cPlanetRecord* planet = GetActivePlanetRecord();
-		int c = 4;
+		StarRequestFilter filter;
+		filter.techLevels = 0;
+		filter.AddTechLevel(TechLevel::Empire);
+		eastl::vector<cStarRecordPtr> stars;
+		StarManager.FindStars(GetActiveStarRecord()->mPosition, filter, stars);
+		for (cStarRecordPtr star : stars) {
+			for (cPlanetRecordPtr planet : star->GetPlanetRecords()) {
+				if (!planet->mTribeData.empty()) {
+					int a = 3;
+				}
+			}
+		}
 		break;
 	}
 	case(5): {
@@ -58,15 +70,12 @@ void DebugAiColonization::ParseLine(const ArgScript::Line& line)
 		break;
 		   }
 	case(6): {
-		eastl::map<ResourceKey, float> spicesCost;
-		SpiceUtils::GetSpiceBaseCosts(spicesCost);
-		int c = 5;
+		GameTimeManager.SetSpeed(0);
 		break;
 	}
 	case(7): {
-		eastl::map<ResourceKey, float> spicesCost;
-		SpiceUtils::GetSpawnableSpiceBaseCosts(spicesCost);
-		int c = 5;
+		GameTimeManager.SetSpeedFactors(1.0, 2.0, 4.0, 20.0);
+		GameTimeManager.SetSpeed(3);
 		break;
 	}
 	case(8): {
