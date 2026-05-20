@@ -67,6 +67,8 @@ void cEmpireColonizationManager::Initialize() {
 
 	App::Property::GetArrayFloat(generalConfiguration.get(), 0xDFC93C59, colonizationRange);
 
+	App::Property::GetBool(generalConfiguration.get(), 0xE5972994, playerEmpireExpansionEnabled);
+
 	App::Property::GetKey(generalConfiguration.get(), 0x7176E6BC, speedConfigKey);
 
 	App::Property::GetKey(generalConfiguration.get(), 0x9732887C, radiusConfigKey);
@@ -125,14 +127,14 @@ void cEmpireColonizationManager::Update(int deltaTime, int deltaGameTime) {
 			if (galacticRadius) {
 				EmpiresMap empiresMap = StarManager.GetEmpires();
 				for (const auto& par : empiresMap) {
-					if (EmpireUtils::ValidNpcEmpire(par.second.get())) {
+					if (EmpireUtils::ValidNpcEmpire(par.second.get(), playerEmpireExpansionEnabled)) {
 						empires.push_back(par.second);
 					}
 				}
 				subcycleStep = 100;
 			}
 			else {
-				EmpireUtils::GetEmpiresInRadius(GetActiveStarRecord()->mPosition, activeRadius, empires);
+				EmpireUtils::GetEmpiresInRadius(GetActiveStarRecord()->mPosition, activeRadius, empires, playerEmpireExpansionEnabled);
 				if (activeRadius <= 100) {
 					subcycleStep = 1000;
 				}
@@ -352,7 +354,10 @@ float cEmpireColonizationManager::EmpireColonizationProbability(cEmpire* empire)
 
 void cEmpireColonizationManager::EmpiresExpansionSubcycle() {
 	for (int i = 0; i < empiresPerSubCycle; i++) {
-		if (empireToExpand != empires.end() && EmpireUtils::ValidNpcEmpire(empireToExpand->get())) {
+		if (empireToExpand != empires.end() && EmpireUtils::ValidNpcEmpire(empireToExpand->get(), playerEmpireExpansionEnabled)) {
+			if (playerEmpireExpansionEnabled && empireToExpand->get() == GetPlayerEmpire() && !MissionManager.mbMission201Finished) {
+				continue;
+			}
 			float pOfExpansion = EmpireColonizationProbability(empireToExpand->get());
 			float n = Math::randf();
 			if (pOfExpansion > n) {

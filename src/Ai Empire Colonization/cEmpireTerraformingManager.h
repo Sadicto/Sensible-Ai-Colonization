@@ -152,6 +152,9 @@ private:
 	// Empire level required to increase a planet's temperature.
 	int levelToIncreaseTemperature;
 
+	// Enables or disables player empire expansion.
+	bool playerEmpireExpansionEnabled;
+
 	// Maps each spice type to its cost, used to improve performance.
 	eastl::map<ResourceKey, float> spiceCosts;
 };

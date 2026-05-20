@@ -68,6 +68,8 @@ void cEmpireTerraformingManager::Initialize() {
 
 	App::Property::GetInt32(generalConfiguration.get(), 0xF3DA8410, levelToIncreaseTemperature);
 
+	App::Property::GetBool(generalConfiguration.get(), 0xE5972994, playerEmpireExpansionEnabled);
+
 	App::Property::GetKey(generalConfiguration.get(), 0x698512E7, terraformingConfigKey);
 
 	App::Property::GetKey(generalConfiguration.get(), 0x84CF94F4, terraformingSpeedConfigKey);
@@ -123,14 +125,14 @@ void cEmpireTerraformingManager::Update(int deltaTime, int deltaGameTime) {
 			if (galacticRadius) {
 				EmpiresMap empiresMap = StarManager.GetEmpires();
 				for (const auto& par : empiresMap) {
-					if (EmpireUtils::ValidNpcEmpire(par.second.get())) {
+					if (EmpireUtils::ValidNpcEmpire(par.second.get(), playerEmpireExpansionEnabled)) {
 						empires.push_back(par.second);
 					}
 				}
 				subcycleStep = 100;
 			}
 			else {
-				EmpireUtils::GetEmpiresInRadius(GetActiveStarRecord()->mPosition, activeRadius, empires);
+				EmpireUtils::GetEmpiresInRadius(GetActiveStarRecord()->mPosition, activeRadius, empires, playerEmpireExpansionEnabled);
 				subcycleStep = 1000;
 			}
 			int numEmpires = empires.size();
@@ -294,7 +296,10 @@ void cEmpireTerraformingManager::EmpireTerraformPlanet(Simulator::cEmpire* empir
 
 void cEmpireTerraformingManager::EmpiresTerraformingSubycle() {
 	for (int i = 0; i < empiresPerSubCycle; i++) {
-		if (empireToTerraform != empires.end() && EmpireUtils::ValidNpcEmpire(empireToTerraform->get())) {
+		if (empireToTerraform != empires.end() && EmpireUtils::ValidNpcEmpire(empireToTerraform->get(), playerEmpireExpansionEnabled)) {
+			if (playerEmpireExpansionEnabled && empireToTerraform->get() == GetPlayerEmpire() && !MissionManager.mbMission201Finished) {
+				continue;
+			}
 			float pOfTerraforming = EmpireTerraformingProbability(empireToTerraform->get());
 			float n = Math::randf();
 			if (pOfTerraforming > n) {

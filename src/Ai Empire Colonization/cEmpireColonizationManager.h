@@ -193,6 +193,9 @@ private:
 	// When colonizing within owned systems, determines whether T0 planets should be excluded.
 	bool excludeT0PlanetColonization;
 
+	// Enables or disables player empire expansion.
+	bool playerEmpireExpansionEnabled;
+
 	// Maps each spice type to its cost, used to improve performance.
 	eastl::map<ResourceKey, float> spiceCosts;
 };

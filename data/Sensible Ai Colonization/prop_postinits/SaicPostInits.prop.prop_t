@@ -1,0 +1,6 @@
+string8s postinitList
+	"Config Config-playerEmpireExpansionEnabled"
+end
+
+key Config SaicConfig!Config.prop
+key Config-playerEmpireExpansionEnabled SaicConfig!Config-playerEmpireExpansionEnabled.prop

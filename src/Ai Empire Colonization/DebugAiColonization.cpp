@@ -34,13 +34,7 @@ void DebugAiColonization::ParseLine(const ArgScript::Line& line)
 		break;
 	}
 	case(3): {
-		StarRequestFilter filter;
-		filter.techLevels = 0;
-		filter.minDistance = 0;
-		filter.maxDistance = 100;
-		filter.AddTechLevel(TechLevel::Tribe);
-		eastl::vector<cStarRecordPtr> stars;
-		StarManager.FindStars(GetActiveStarRecord()->mPosition, filter, stars);
+		bool a = MissionManager.mbMission201Finished;
 		break;
 	}
 	case(4): {
