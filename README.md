@@ -16,6 +16,7 @@ This mod fixes that by making empires expand in a more cohesive and strategic wa
 - Once an empire has no nearby colonizable stars, it will begin colonizing planets within already owned star systems. This behavior can be customized when installing the mod.
 - Empires will terraform planets within their owned star systems. This behavior can be customized when installing the mod.
 - AI avoids colonizing special systems like Sol, systems with monoliths, save file stars, etc.
+- Includes an option to allow the mod to affect the player empire, causing it to colonize and terraform planets using the same rules as AI empires.
 - The Grox and empires from other saves are not affected by this mod.
 
 ## Comparison
@@ -25,5 +26,9 @@ This mod fixes that by making empires expand in a more cohesive and strategic wa
 | ![Without the mod](images/VanillaExpansion.png) | ![With the mod](images/ModdedExpansion.png) |
 
 Both screenshots were taken after 1 hour and 30 minutes at fast speed.
+
+## Installation
+- Requires UPE.
+- This mod can be installed, reinstalled, or removed in existing saves.
 
 ---
