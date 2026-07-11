@@ -176,6 +176,10 @@ cEmpireColonizationManager* cEmpireColonizationManager::Get() {
 	return instance;
 }
 
+bool cEmpireColonizationManager::ColonizablePlanet(cPlanetRecord* planet){
+	return PlanetUtils::InteractablePlanet(planet) && !PlanetUtils::PlanetHasWildlifeSanctuary(planet);
+}
+
 float cEmpireColonizationManager::PlanetColonizationScore(cPlanetRecord* planet) {
     float score = 1;
 	//if habitable, more terrascore more points.
@@ -209,8 +213,20 @@ float cEmpireColonizationManager::PlanetColonizationScore(cPlanetRecord* planet)
 	return score;
 }
 
-bool cEmpireColonizationManager::ColonizableStar(cStarRecord* star) { 
-	return StarUtils::ValidStar(star) && 
+bool cEmpireColonizationManager::ColonizableStar(cStarRecord* star) {
+	bool validStar = StarUtils::ValidStar(star);
+	if (!validStar) {
+		return false;
+	}
+	bool starHasColonizablePlanet = false;
+	for (cPlanetRecordPtr planet : star->GetPlanetRecords()) {
+		if (ColonizablePlanet(planet.get())) {
+			starHasColonizablePlanet = true;
+			break;
+		}
+	}
+	return validStar &&
+		starHasColonizablePlanet &&
 		star->GetTechLevel() != TechLevel::Empire;
 }
 
@@ -230,10 +246,11 @@ cPlanetRecordPtr cEmpireColonizationManager::BestColonizablePlanet(cStarRecord* 
 	eastl::vector<cPlanetRecordPtr> colonizablePlanets;
 
 	for (cPlanetRecordPtr planet : star->GetPlanetRecords()) {
-		if (PlanetUtils::InteractablePlanet(planet.get())) {
+		if (ColonizablePlanet(planet.get())) {
 			colonizablePlanets.push_back(planet); 
 		}
 	}
+
 
 	cPlanetRecordPtr bestPlanet = colonizablePlanets.front();
 	float bestScore = PlanetColonizationScore(bestPlanet.get());
@@ -283,6 +300,15 @@ void cEmpireColonizationManager::ColonizeStarSystem(cEmpire* empire, cStarRecord
 void cEmpireColonizationManager::ColonizePlanetInOwnedSystem(cEmpire* empire) {
 	eastl::vector<cPlanetRecordPtr> planets;
 	EmpireUtils::GetEmpirePlanets(empire, planets, true, false, false, false, excludeT0PlanetColonization);
+
+	// Delete non-colonizable planets.
+	planets.erase(
+		eastl::remove_if(planets.begin(), planets.end(),
+			[this](const cPlanetRecordPtr& planet) {
+				return !ColonizablePlanet(planet.get());
+			}),
+		planets.end());
+
 	// Find the planet with the best colonization score.
 	auto it = eastl::max_element(planets.begin(), planets.end(),
 		[this](const cPlanetRecordPtr& a, const cPlanetRecordPtr& b) {

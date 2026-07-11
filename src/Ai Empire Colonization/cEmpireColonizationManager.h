@@ -51,17 +51,27 @@ public:
 	static cEmpireColonizationManager* Get();
 
 	/**
+	 * @brief Checks whether a planet is eligible for colonization.
+	 * A planet is considered colonizable if it is interactable
+	 *  and does not contain a Wildlife Sanctuary.
+	 * @param planet Pointer to the planet to evaluate.
+	 * @return true if the planet can be colonized, false otherwise.
+	 */
+	bool ColonizablePlanet(cPlanetRecord* planet);
+
+	/**
 	 * @brief Calculates the colonization score of a planet,
 	 * with higher scores for a higher terrascore,
 	 * expensive spice, and T0 with green orbits,
 	 * and lower scores for moons.
-	 * @param planet Pointer to the planet (cPlanetRecord*) to evaluate.
+	 * @param planet Pointer to the planet to evaluate.
 	 * @return float score representing the colonization potential of the planet.
 	 */
 	float PlanetColonizationScore(cPlanetRecord* planet);
 
 	/**
 	* @brief Determines if a given star system is colonizable, meaning it is a valid star,
+	* has at least one colonizable planet,
 	* has no owning empire (tribes and civilizations do not count) an
 	* is at most activeRadius parsecs from the player
 	* @param star.

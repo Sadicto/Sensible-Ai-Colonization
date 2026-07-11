@@ -177,7 +177,9 @@ bool cEmpireTerraformingManager::TerraformablePlanet(Simulator::cPlanetRecord* p
 		else {
 			SolarSystemOrbitTemperature orbit = PlanetUtils::GetPlanetOrbitTemperature(planet);
 			bool greenOrbit = orbit == SolarSystemOrbitTemperature::Normal;
-			return playerNotInSystem && (greenOrbit || (goodSpiceTerraformAllowed && !SpiceUtils::LowValueSpice(planet->mSpiceGen, spiceCosts)));
+			return playerNotInSystem && 
+				!PlanetUtils::PlanetHasWildlifeSanctuary(planet) && 
+				(greenOrbit || (goodSpiceTerraformAllowed && !SpiceUtils::LowValueSpice(planet->mSpiceGen, spiceCosts)));
 		}
 	}
 	return false;

@@ -17,7 +17,7 @@ int32 levelToIncreaseAtmosphere 1
 int32 levelToDecreaseTemperature 2
 int32 levelToIncreaseTemperature 3
 
-bool playerEmpireExpansionEnabled true
+bool playerEmpireExpansionEnabled false
 
 key speedConfig SaicConfig!SpeedConfig.prop
 

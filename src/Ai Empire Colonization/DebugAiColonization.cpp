@@ -38,31 +38,30 @@ void DebugAiColonization::ParseLine(const ArgScript::Line& line)
 		break;
 	}
 	case(4): {
-		StarRequestFilter filter;
-		filter.techLevels = 0;
-		filter.AddTechLevel(TechLevel::Empire);
+		bool planet = PlanetUtils::PlanetHasWildlifeSanctuary(GetActivePlanetRecord());
+		break;
+	}
+	case(5): {
 		eastl::vector<cStarRecordPtr> stars;
-		StarManager.FindStars(GetActiveStarRecord()->mPosition, filter, stars);
+		Simulator::StarRequestFilter filter;
+		filter.RemoveStarType(Simulator::StarType::None);
+		filter.RemoveStarType(Simulator::StarType::GalacticCore);
+		filter.RemoveStarType(Simulator::StarType::ProtoPlanetary);
+		filter.RemoveStarType(Simulator::StarType::BlackHole);
+
+		filter.minDistance = 0;
+		filter.maxDistance = 9999;
+		Simulator::cStarManager* starManager = Simulator::cStarManager::Get();
+		starManager->FindStars(GetActiveStarRecord()->mPosition, filter, stars);
 		for (cStarRecordPtr star : stars) {
 			for (cPlanetRecordPtr planet : star->GetPlanetRecords()) {
-				if (!planet->mTribeData.empty()) {
-					int a = 3;
+				if (PlanetUtils::PlanetHasWildlifeSanctuary(planet.get())) {
+					int a = 1;
 				}
 			}
 		}
 		break;
 	}
-	case(5): {
-		cPlanetRecord* planet = GetActivePlanetRecord();
-		planet->mCivData.clear();
-		cPlanetRecord::FillPlanetDataForTechLevel(planet, TechLevel::Empire);
-		cStarRecord* star = planet->GetStarRecord();
-		cEmpire* empire = StarManager.GetEmpire(star->mEmpireID);
-		for (auto civData : planet->mCivData) {
-			civData->mPoliticalID = planet->GetStarRecord()->mEmpireID;
-		}
-		break;
-		   }
 	case(6): {
 		GameTimeManager.SetSpeed(0);
 		break;
