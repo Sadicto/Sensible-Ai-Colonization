@@ -10,7 +10,7 @@ This mod fixes that by making empires expand in a more cohesive and strategic wa
 - AI empires prioritize nearby systems, expanding in clusters and avoiding isolated colonies.
 - Empires favor systems with high-value spice types and/or habitable planets.
 - When colonizing a star system, the AI will always pick the best planet available.
-- Once an empire reaches a high enough strength factor, it will start conquering systems inhabited by tribes or civilizations.
+- AI colonization of star systems containing tribes and civilizations is configurable. When enabled, empires can only colonize these systems if they control the closest neighboring star system.
 - The speed at which empires expand can be customized when the mod is installed.
 - The radius around the player within which empires can expand is customizable when the mod is installed.
 - Once an empire has no nearby colonizable stars, it will begin colonizing planets within already owned star systems. This behavior can be customized when installing the mod.
