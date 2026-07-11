@@ -1,4 +1,4 @@
-uint32 preSpaceColonizationRule 1 # 0 disabled, 1 BasedOnEmpireArchetype, 2 Unrestricted.
+uint32 preSpaceColonizationRule 0 # 0 disabled, 1 BasedOnEmpireArchetype, 2 Unrestricted.
 
 int32 levelToColonizeTribes 1
 

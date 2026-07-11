@@ -38,7 +38,8 @@ void DebugAiColonization::ParseLine(const ArgScript::Line& line)
 		break;
 	}
 	case(4): {
-		bool planet = PlanetUtils::PlanetHasWildlifeSanctuary(GetActivePlanetRecord());
+		eastl::vector<cStarRecordPtr> closestStars;
+		StarUtils::GetClosestStarsToStar(GetActiveStarRecord(), 5, closestStars);
 		break;
 	}
 	case(5): {
@@ -50,9 +51,13 @@ void DebugAiColonization::ParseLine(const ArgScript::Line& line)
 		filter.RemoveStarType(Simulator::StarType::BlackHole);
 
 		filter.minDistance = 0;
-		filter.maxDistance = 3;
+		filter.maxDistance = 99999;
 		Simulator::cStarManager* starManager = Simulator::cStarManager::Get();
 		starManager->FindStars(GetActiveStarRecord()->mPosition, filter, stars);
+		for (auto star : stars) {
+			eastl::vector<cStarRecordPtr> closestStars;
+			StarUtils::GetClosestStarsToStar(star.get(), 5, closestStars);
+		}
 		break;
 	}
 	case(6): {

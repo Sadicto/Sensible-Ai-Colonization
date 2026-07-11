@@ -288,12 +288,32 @@ bool cEmpireColonizationManager::EmpireCanColonizeStarWithCivilizations(cEmpire*
 }
 
 bool cEmpireColonizationManager::EmpireCanColonizeStar(cEmpire* empire, cStarRecord* star){
-	TechLevel techLevel = star->GetTechLevel();
+	if (!ColonizableStar(star)) {
+		return false;
+	}
 
-	return ColonizableStar(star) 
-		&& (techLevel == TechLevel::None || techLevel == TechLevel::Creature
-		|| (techLevel == TechLevel::Tribe && EmpireCanColonizeStarWithTribes(empire))
-		|| (techLevel == TechLevel::Civilization && EmpireCanColonizeStarWithCivilizations(empire)));
+	TechLevel techLevel = star->GetTechLevel();
+	bool canColonizeTechLevel =
+		techLevel == TechLevel::None ||
+		techLevel == TechLevel::Creature ||
+		(techLevel == TechLevel::Tribe && EmpireCanColonizeStarWithTribes(empire)) ||
+		(techLevel == TechLevel::Civilization && EmpireCanColonizeStarWithCivilizations(empire));
+
+	if (!canColonizeTechLevel){
+		return false;
+	}
+
+	// Tribes and civilizations require control of the closest star.
+	if (techLevel == TechLevel::Tribe || techLevel == TechLevel::Civilization) {
+		cStarRecord* closestStar = StarUtils::GetClosestStarToStar(star);
+		if (closestStar != nullptr) {
+			cEmpire* empireOwner = StarManager.GetEmpire(closestStar->mEmpireID);
+			if (empireOwner != empire) {
+				return false;
+			}
+		}
+	}
+	return true;
 }
 
 
