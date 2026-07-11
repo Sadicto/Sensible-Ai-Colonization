@@ -28,7 +28,7 @@ This mod fixes that by making empires expand in a more cohesive and strategic wa
 Both screenshots were taken after 1 hour and 30 minutes at fast speed.
 
 ## Installation
-- Requires UPE.
+- Requires [UPE](https://github.com/Zarklord/UniversalPropertyEnhancer/releases/tag/v1.2.0).
 - This mod can be installed, reinstalled, or removed in existing saves.
 
 ---
