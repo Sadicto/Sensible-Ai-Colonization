@@ -9,9 +9,6 @@ floats empireColonizationRange
 	7.0
 end
 
-int32 levelToColonizeTribe 1
-int32 levelToColonizeCiv 3
-
 int32 levelToDecreaseAtmosphere 0
 int32 levelToIncreaseAtmosphere 1
 int32 levelToDecreaseTemperature 2
@@ -28,3 +25,5 @@ key intraSystemPlanetColonizationConfig SaicConfig!IntraSystemColonizationConfig
 key terraformingConfig SaicConfig!TerraformingConfig.prop
 
 key terraformingSpeedConfig SaicConfig!TerraformingSpeedConfig.prop
+
+key preSpaceColonizationConfig SaicConfig!PreSpaceColonizationConfig.prop

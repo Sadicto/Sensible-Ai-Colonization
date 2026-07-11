@@ -61,10 +61,6 @@ void cEmpireColonizationManager::Initialize() {
 
 	App::Property::GetFloat(generalConfiguration.get(), 0x98199E80, targetNumSystems);
 
-	App::Property::GetInt32(generalConfiguration.get(), 0xD226209D, levelToColonizeTribe);
-
-	App::Property::GetInt32(generalConfiguration.get(), 0xBEE4774B, levelToColonizeCiv);
-
 	App::Property::GetArrayFloat(generalConfiguration.get(), 0xDFC93C59, colonizationRange);
 
 	App::Property::GetBool(generalConfiguration.get(), 0xE5972994, playerEmpireExpansionEnabled);
@@ -74,6 +70,8 @@ void cEmpireColonizationManager::Initialize() {
 	App::Property::GetKey(generalConfiguration.get(), 0x9732887C, radiusConfigKey);
 
 	App::Property::GetKey(generalConfiguration.get(), 0x21EC8183, intraSystemColonizationKey);
+
+	App::Property::GetKey(generalConfiguration.get(), 0x701A8093, preSpaceColonizationConfigKey);
 
 	// Speed configuration.
 	PropertyListPtr speedConfiguration;
@@ -106,6 +104,8 @@ void cEmpireColonizationManager::Initialize() {
 	else {
 		App::ConsolePrintF("A broken installation of SensibleAiColonization was detected, please reinstall the mod.");
 	}
+
+	preSpaceColonizationConfig = nullptr;
 
 	elapsedTime = 0;
 
@@ -163,12 +163,19 @@ void cEmpireColonizationManager::Update(int deltaTime, int deltaGameTime) {
 
 void cEmpireColonizationManager::OnModeEntered(uint32_t previousModeID, uint32_t newModeID) {
 	if (newModeID == GameModeIDs::kGameSpace) {
+		preSpaceColonizationConfig = new cPreSpaceColonizationConfig(preSpaceColonizationConfigKey);
 		spiceCosts.clear();
 		SpiceUtils::GetSpawnableSpiceBaseCosts(spiceCosts);
 		// Randomizes the start of the first cycle to avoid being synchronized with the cycles of other managers.
 		elapsedTime = Math::rand(cycleInterval / 2);
 		lastSubcycleTime = 9999999;
 		subcycleStep = 9999999;
+	}
+}
+
+void cEmpireColonizationManager::OnModeExited(uint32_t previousModeID, uint32_t newModeID){
+	if (previousModeID == GameModeIDs::kGameSpace) {
+		preSpaceColonizationConfig.reset();
 	}
 }
 
@@ -230,14 +237,63 @@ bool cEmpireColonizationManager::ColonizableStar(cStarRecord* star) {
 		star->GetTechLevel() != TechLevel::Empire;
 }
 
+bool cEmpireColonizationManager::EmpireCanColonizeStarWithTribes(cEmpire* empire){
+	bool canColonize = false;
+
+	switch (preSpaceColonizationConfig->GetPreSpaceColonizationRule()) {
+	case PreSpaceColonizationRule::Disabled:
+		canColonize = false;
+		break;
+
+	case PreSpaceColonizationRule::BasedOnEmpireArchetype:
+		canColonize = preSpaceColonizationConfig->CanArchetypeColonizeTribes(empire->mArchetype);
+		break;
+
+	case PreSpaceColonizationRule::Unrestricted:
+		canColonize = true;
+		break;
+
+	default:
+		canColonize = false;
+		break;
+	}
+
+	return canColonize
+		&& EmpireUtils::GetEmpireLevel(empire) >= preSpaceColonizationConfig->GetLevelToColonizeTribes();
+}
+
+bool cEmpireColonizationManager::EmpireCanColonizeStarWithCivilizations(cEmpire* empire){
+	bool canColonize = false;
+
+	switch (preSpaceColonizationConfig->GetPreSpaceColonizationRule()) {
+	case PreSpaceColonizationRule::Disabled:
+		canColonize = false;
+		break;
+
+	case PreSpaceColonizationRule::BasedOnEmpireArchetype:
+		canColonize = preSpaceColonizationConfig->CanArchetypeColonizeCivilizations(empire->mArchetype);
+		break;
+
+	case PreSpaceColonizationRule::Unrestricted:
+		canColonize = true;
+		break;
+
+	default:
+		canColonize = false;
+		break;
+	}
+
+	return canColonize
+		&& EmpireUtils::GetEmpireLevel(empire) >= preSpaceColonizationConfig->GetLevelToColonizeCivilizations();
+}
+
 bool cEmpireColonizationManager::EmpireCanColonizeStar(cEmpire* empire, cStarRecord* star){
 	TechLevel techLevel = star->GetTechLevel();
-	int empireLevel = EmpireUtils::GetEmpireLevel(empire);
 
 	return ColonizableStar(star) 
 		&& (techLevel == TechLevel::None || techLevel == TechLevel::Creature
-		|| (techLevel == TechLevel::Tribe && empireLevel >= levelToColonizeTribe)
-		|| (techLevel == TechLevel::Civilization && empireLevel >= levelToColonizeCiv));
+		|| (techLevel == TechLevel::Tribe && EmpireCanColonizeStarWithTribes(empire))
+		|| (techLevel == TechLevel::Civilization && EmpireCanColonizeStarWithCivilizations(empire)));
 }
 
 

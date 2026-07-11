@@ -110,6 +110,10 @@
       <SubType>
       </SubType>
     </ClInclude>
+    <ClInclude Include="Config\cPreSpaceColonizationConfig.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
     <ClInclude Include="DebugAiColonization.h">
       <SubType>
       </SubType>
@@ -118,6 +122,7 @@
       <SubType>
       </SubType>
     </ClInclude>
+    <ClInclude Include="Spore-Mod-Utils\ArchetypeUtils\ArchetypeUtils.h" />
     <ClInclude Include="Spore-Mod-Utils\SpiceUtils\SpiceUtils.h" />
     <ClInclude Include="Spore-Mod-Utils\EmpireUtils\EmpireUtils.h" />
     <ClInclude Include="Spore-Mod-Utils\PlanetUtils\PlanetUtils.h" />
@@ -137,6 +142,10 @@
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Config\cPreSpaceColonizationConfig.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="DebugAiColonization.cpp">
       <SubType>
       </SubType>
@@ -153,6 +162,7 @@
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Spore-Mod-Utils\ArchetypeUtils\ArchetypeUtils.cpp" />
     <ClCompile Include="Spore-Mod-Utils\SpiceUtils\SpiceUtils.cpp" />
     <ClCompile Include="Spore-Mod-Utils\EmpireUtils\EmpireUtils.cpp" />
     <ClCompile Include="Spore-Mod-Utils\PlanetUtils\PlanetUtils.cpp">

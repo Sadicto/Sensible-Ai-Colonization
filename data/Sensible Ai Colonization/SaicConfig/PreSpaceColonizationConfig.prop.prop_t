@@ -1,0 +1,27 @@
+uint32 preSpaceColonizationRule 1 # 0 disabled, 1 BasedOnEmpireArchetype, 2 Unrestricted.
+
+int32 levelToColonizeTribes 1
+
+int32 levelToColonizeCivilizations 3
+
+bools tribeColonizationByArchetype
+	true  # Warrior
+	true # Trader
+	true # Scientist
+	false # Shaman
+	false # Bard
+	true # Zealot
+	false # Diplomat
+	false # Ecologist
+end
+
+bools civilizationColonizationByArchetype
+	true  # Warrior
+	false # Trader
+	true # Scientist
+	false # Shaman
+	false # Bard
+	true # Zealot
+	false # Diplomat
+	false # Ecologist
+end

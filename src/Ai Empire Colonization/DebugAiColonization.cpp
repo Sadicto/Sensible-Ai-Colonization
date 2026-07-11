@@ -50,16 +50,9 @@ void DebugAiColonization::ParseLine(const ArgScript::Line& line)
 		filter.RemoveStarType(Simulator::StarType::BlackHole);
 
 		filter.minDistance = 0;
-		filter.maxDistance = 9999;
+		filter.maxDistance = 3;
 		Simulator::cStarManager* starManager = Simulator::cStarManager::Get();
 		starManager->FindStars(GetActiveStarRecord()->mPosition, filter, stars);
-		for (cStarRecordPtr star : stars) {
-			for (cPlanetRecordPtr planet : star->GetPlanetRecords()) {
-				if (PlanetUtils::PlanetHasWildlifeSanctuary(planet.get())) {
-					int a = 1;
-				}
-			}
-		}
 		break;
 	}
 	case(6): {

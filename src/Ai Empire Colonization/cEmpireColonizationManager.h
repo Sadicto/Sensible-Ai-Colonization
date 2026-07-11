@@ -3,6 +3,7 @@
 #include <Spore\BasicIncludes.h>
 #include <Spore/Simulator/Serialization.h>
 #include "Spore-Mod-Utils/Include/SporeModUtils.h"
+#include <Config/cPreSpaceColonizationConfig.h>
 
 #define cEmpireColonizationManagerPtr intrusive_ptr<cEmpireColonizationManager>
 
@@ -12,12 +13,6 @@ class cEmpireColonizationManager
 	: public Simulator::cStrategy
 {
 public:
-
-	enum class PlanetColonizationConfig : uint32_t {
-		Disabled = 0,
-		OnlyHabitable = 1,
-		AllPlanets = 2
-	};
 
 	static const uint32_t TYPE = id("AiEmpireColonization::cEmpireColonizationManager");
 	static const uint32_t NOUN_ID = TYPE;
@@ -42,6 +37,8 @@ public:
 	// Inherited via cStrategy
 
 	void OnModeEntered(uint32_t previousModeID, uint32_t newModeID) override;
+
+	void OnModeExited(uint32_t previousModeID, uint32_t newModeID) override;
 
 	static Simulator::Attribute ATTRIBUTES[];
 	//
@@ -79,10 +76,31 @@ public:
 	*/
 	bool ColonizableStar(cStarRecord* star);
 
+	/**
+	 * @brief Determines whether the given empire is allowed to colonize
+	 * star systems containing tribes according to the current pre-space
+	 * colonization rule.
+	 * @param empire Pointer to the empire (cEmpire*) being evaluated.
+	 * @return true if the empire can colonize systems containing tribes, false otherwise.
+	 */
+	bool EmpireCanColonizeStarWithTribes(cEmpire* empire);
+
+	/**
+	 * @brief Determines whether the given empire is allowed to colonize
+	 * star systems containing civilizations according to the current pre-space
+	 * colonization rule.
+	 * @param empire Pointer to the empire (cEmpire*) being evaluated.
+	 * @return true if the empire can colonize systems containing civilizations, false otherwise.
+	 */
+	bool EmpireCanColonizeStarWithCivilizations(cEmpire* empire);
+
 
 	/**
 	 * Determines whether the given empire can colonize the specified star system.
 	 * A star is colonizable if ColonizableStar(star) returns true and,
+	 * for systems containing tribes or civilizations, the empire is allowed
+	 * to colonize according to the current pre-space
+	 * colonization rule and meets the required empire level.
 	 * if the system contains civilizations or tribes, the empire must have a high enough level.
 	 */
 	bool EmpireCanColonizeStar(cEmpire* empire, cStarRecord* star);
@@ -155,6 +173,10 @@ private:
 	
 	static cEmpireColonizationManager* instance;
 
+	ResourceKey preSpaceColonizationConfigKey;
+
+	cPreSpaceColonizationConfigPtr preSpaceColonizationConfig;
+
 	// Radius (in parsecs) in which empires colonize systems, don't matter if galacticRadius = true.
 	float activeRadius;
 
@@ -190,12 +212,6 @@ private:
 	
 	// Colonization range per empire level, in parsecs.
 	eastl::vector<float> colonizationRange;
-
-	// Minimun level for an empire to be able to colonize a star with a tribe.
-	int levelToColonizeTribe;
-
-	// Minimun level for an empire to be able to colonize a star with a civ.
-	int levelToColonizeCiv;
 
 	// Allows AI empires to colonize additional planets within systems they already control.
 	bool enableIntraSystemColonization;
