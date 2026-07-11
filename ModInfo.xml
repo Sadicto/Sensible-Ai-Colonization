@@ -45,6 +45,12 @@
 		<component game="GalacticAdventures" displayName="Disabled" description="The player empire will not be affected by this mod." unique ="SensibleAIColonization_DisabledPlayerExpansion_Config" defaultChecked="true">SensibleAIColonization_DisabledPlayerExpansion_Config.package</component>
 		<component game="GalacticAdventures" displayName="Enabled" description="The player empire will colonize and terraform planets using the same rules and restrictions as other AI empires." unique ="SensibleAIColonization_EnabledPlayerExpansion_Config" defaultChecked="false">SensibleAIColonization_EnabledPlayerExpansion_Config.package</component>
 	</componentGroup>
+	<!-- PreSpaceColonizationRuleConfig -->
+	<componentGroup displayName="Tribes And Civilizations Colonization Rule Configuration" unique="SensibleAiColonization_PlayerExpansion_Config">
+		<component game="GalacticAdventures" displayName="Disabled" description="Empires will not colonize star systems containing tribes or civilizations." unique ="SensibleAIColonization_DisabledPreSpaceColonizationRule_Config" defaultChecked="true">SensibleAIColonization_DisabledPreSpaceColonizationRule_Config.package</component>
+		<component game="GalacticAdventures" displayName="Based on Empire Archetype" description="Warrior, Scientist, and Zealot empires can colonize star systems containing tribes or civilizations. Trader empires can colonize systems containing tribes, but not civilizations. Shaman, Bard, Diplomat, and Ecologist empires cannot colonize systems containing tribes or civilizations." unique ="SensibleAIColonization_BasedOnEmpireArchetypePreSpaceColonizationRule_Config" defaultChecked="false">SensibleAIColonization_BasedOnEmpireArchetypePreSpaceColonizationRule_Config.package</component>
+		<component game="GalacticAdventures" displayName="Unrestricted" description="All empires can colonize star systems containing tribes or civilizations." unique ="SensibleAIColonization_UnrestrictedPreSpaceColonizationRule_Config" defaultChecked="false">SensibleAIColonization_UnrestrictedPreSpaceColonizationRule_Config.package</component>
+	</componentGroup>
 	<!-- Main -->
 	<prerequisite game="GalacticAdventures">SensibleAIColonization_Main.package</prerequisite>
 	<prerequisite>Ai Empire Colonization.dll</prerequisite>
@@ -83,4 +89,8 @@
 	<!-- PlayerExpansionConfig -->
 	<remove game="GalacticAdventures">SensibleAIColonization_DisabledPlayerExpansion_Config.package</remove>
 	<remove game="GalacticAdventures">SensibleAIColonization_EnabledPlayerExpansion_Config.package</remove>
+	<!-- PreSpaceColonizationRuleConfig -->
+	<remove game="GalacticAdventures">SensibleAIColonization_DisabledPreSpaceColonizationRule_Config.package</remove>
+	<remove game="GalacticAdventures">SensibleAIColonization_BasedOnEmpireArchetypePreSpaceColonizationRule_Config.package</remove>
+	<remove game="GalacticAdventures">SensibleAIColonization_UnrestrictedPreSpaceColonizationRule_Config.package</remove>
 </mod>
