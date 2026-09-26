@@ -259,7 +259,7 @@ bool cEmpireColonizationManager::EmpireCanColonizeStarWithTribes(cEmpire* empire
 	}
 
 	return canColonize
-		&& EmpireUtils::GetEmpireLevel(empire) >= preSpaceColonizationConfig->GetLevelToColonizeTribes();
+		&& empire->GetWeaponryLevel() >= preSpaceColonizationConfig->GetLevelToColonizeTribes();
 }
 
 bool cEmpireColonizationManager::EmpireCanColonizeStarWithCivilizations(cEmpire* empire){
@@ -283,8 +283,7 @@ bool cEmpireColonizationManager::EmpireCanColonizeStarWithCivilizations(cEmpire*
 		break;
 	}
 
-	return canColonize
-		&& EmpireUtils::GetEmpireLevel(empire) >= preSpaceColonizationConfig->GetLevelToColonizeCivilizations();
+	return canColonize && empire->GetWeaponryLevel() >= preSpaceColonizationConfig->GetLevelToColonizeCivilizations();
 }
 
 bool cEmpireColonizationManager::EmpireCanColonizeStar(cEmpire* empire, cStarRecord* star){
@@ -395,9 +394,27 @@ void cEmpireColonizationManager::ColonizePlanetInOwnedSystem(cEmpire* empire) {
 	}
 }
 
+float cEmpireColonizationManager::GetColonizationRange(cEmpire* empire)
+{
+	int empireLevel = empire->GetWeaponryLevel();
+	if (colonizationRange.empty())
+	{
+		return 1;
+	}
+	if (empireLevel < 0)
+	{
+		return colonizationRange[0];
+	}
+	if (empireLevel >= int(colonizationRange.size()))
+	{
+		return colonizationRange.back();
+	}
+	return colonizationRange[empireLevel];
+}
+
 void cEmpireColonizationManager::ExpandEmpire(cEmpire* empire) {
 	cStarRecord* homeworld = EmpireUtils::GetHomeStar(empire);
-	float range = colonizationRange[EmpireUtils::GetEmpireLevel(empire)];
+	float range = GetColonizationRange(empire);
 	eastl::vector<cStarRecordPtr> empireStars = empire->mStars;
 	cStarRecordPtr candidateStar = NULL;
 

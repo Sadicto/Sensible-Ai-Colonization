@@ -189,7 +189,7 @@ bool cEmpireTerraformingManager::EmpireCanTerraformPlanet(Simulator::cEmpire* em
 	if (TerraformablePlanet(planet)) {
 		PlanetType targetTerrascore = static_cast<PlanetType>(static_cast<int>(planet->mType) + 1);
 		TerraformingUtils::TerraformingObstacle terraformingObstable = TerraformingUtils::GetTerraformingObstacle(planet, targetTerrascore);
-		int empireLevel = EmpireUtils::GetEmpireLevel(empire);
+		int empireLevel = empire->GetWeaponryLevel();
 		int levelRequiredToTerraformPlanet = 0;
 
 		switch (terraformingObstable) {
