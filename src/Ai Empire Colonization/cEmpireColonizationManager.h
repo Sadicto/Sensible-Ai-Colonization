@@ -142,6 +142,13 @@ public:
 	void ColonizePlanetInOwnedSystem(cEmpire* empire);
 
 	/**
+	 * @brief Returns the colonization range of the empire, as defined in colonizationRange.
+	 * @param empire.
+	 * @return The colonization range of the empire, based on its weaponryLevel.
+	 */
+	float GetColonizationRange(cEmpire* empire);
+
+	/**
 	 * @brief Expands the given empire to a new star system, prioritizing
 	 * systems that are closer to the homeworld or existing colonies,
 	 * and those with a higher StarColonizationScore(Star).
